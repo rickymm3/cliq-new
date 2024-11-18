@@ -1,3 +1,7 @@
-= form_with url: search_cliqs_path, method: :post do |form|
-  = form.search_field :name, value: params[:name], oninput: "this.form.requestSubmit()"
-#search_results
+#cliq-search-container
+  = form_with model: @cliq, url: search_cliqs_path, method: :post, data: {controller: "search", turbo_frame: "cliq-search-results" } do |form|
+    = form.text_field :name, placeholder: "Search Cliqs", autocomplete: "off", class: "search-input", data: { target: "search.input", action: "input->search#search" }
+    = form.submit "Search", class: "btn"
+
+%turbo-frame#cliq-search-results
+  = render "no_results"

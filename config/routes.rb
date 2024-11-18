@@ -27,7 +27,7 @@ Rails.application.routes.draw do
       get 'all', to: 'cliqs#all'
     end
     collection do
-      post 'search', to: 'cliqs#search'
+      post :search
     end
     resources :posts, only: [:new]  # New post route within a cliq
     resources :cliqs, only: [:show, :new, :create], controller: 'cliqs', path: ''  # Nested cliq routes

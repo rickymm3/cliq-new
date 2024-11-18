@@ -20,4 +20,8 @@ class Cliq < ApplicationRecord
     @ids = [self.id] + self.child_cliqs.flat_map(&:self_and_descendant_ids)
   end
 
+  def self.search(query)
+    where("name ILIKE ?", "%#{query}%") # Use ILIKE for case-insensitive matching
+  end
+
 end

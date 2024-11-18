@@ -1,5 +1,5 @@
 class CliqsController < ApplicationController
-  before_action :set_cliq, only: %i[ show edit update destroy ]
+  before_action :set_cliq, only: %i[ show edit update destroy]
 
   # GET /cliqs or /cliqs.json
 
@@ -19,7 +19,6 @@ class CliqsController < ApplicationController
 
   # GET /cliqs/slug or /cliqs/1.json
   def show
-    @cliq = set_cliq if params[:id]
     @parent_cliqs = get_all_parent_cliqs(@cliq)
     if params[:id]
       cliq_ids = @cliq.self_and_descendant_ids
@@ -48,14 +47,14 @@ class CliqsController < ApplicationController
   end
 
   def search
-    @cliqs = Cliq.where('name ILIKE ?', "%#{params[:name]}%").order(created_at: :desc)
-    respond_to do |format|
-      format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.update("search_results",
-            partial: "cliqs/search_results",
-            locals: { cliqs: @cliqs })
-          ]
+
+    query = cliq_params[:name] # Use strong parameters for security
+    if query.blank?
+      render turbo_stream: turbo_stream.replace("cliq-search-results", partial: "cliqs/no_results")
+    else
+      @cliqs = Cliq.search(query)
+      respond_to do |format|
+        format.turbo_stream
       end
     end
   end
@@ -136,11 +135,11 @@ class CliqsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_cliq
-      Cliq.friendly.find(params[:id]) # Use this if 'entertainment' is a slug
+      @cliq = Cliq.friendly.find(params[:id]) # Use this if 'entertainment' is a slug
     end
 
     # Only allow a list of trusted parameters through.
     def cliq_params
-      params.require(:cliq).permit(:name, :slug, :description, :parent_cliq_id) # Replace :attribute1, etc., with actual attribute names of Cliq model
+      params.require(:cliq).permit(:name, :slug, :description, :parent_cliq_id, :cliq) # Replace :attribute1, etc., with actual attribute names of Cliq model
     end
 end

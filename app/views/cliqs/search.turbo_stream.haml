@@ -1,0 +1,5 @@
+= turbo_stream.replace "cliq-search-results" do
+  %turbo-frame#cliq-search-results
+    %ul
+      - @cliqs.each do |cliq|
+        %li= cliq.name

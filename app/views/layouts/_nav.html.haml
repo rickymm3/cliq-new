@@ -18,11 +18,4 @@
             = link_to "Sign Up", new_user_registration_path, class: "nav-link"
 
     / Search form - Integrated into the navigation bar
-    = form_with url: search_cliqs_path, method: :post, data: { controller: "search", action: "input->search#search" }, class: "d-flex" do
-      = text_field_tag :query, params[:query], placeholder: "Search Cliqs...", autocomplete: "off", class: "form-control me-2", data: { action: "input->search#search" }
-      = submit_tag "Search", class: "btn btn-outline-success"
-
-
-      / This will hold the search results dynamically
-      .search-results-container
-        %div#search-results
+    = render "cliqs/search"
