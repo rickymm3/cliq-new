@@ -1,0 +1,12 @@
+=turbo_frame_tag "main_content" do
+  .mx-auto{class: "w-1/2"}
+    .flex.justify-between.items-center
+      %h1.font-bold.text-4xl
+    .heirarchy
+      =render "/layouts/cliq_bar/parent_cliqs"
+    =render "new_cliq"
+    .new-post
+      =render "/posts/shared/new_post"
+    #cards.min-w-full
+      = render 'posts'
+    = render "pager", pagy: @pagy, cliq: @cliq

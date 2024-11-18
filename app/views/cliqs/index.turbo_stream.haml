@@ -1,0 +1,11 @@
+-# = turbo_stream.append "posts" do
+-#   = render @posts
+-# - if @posts.next_page
+-#   %div{"data-controller" => "load-more", "data-load-more-list-id-value" => "posts", "data-load-more-url-value" => "#{cliqs_path(page: @posts.next_page)}"}
+-# - else
+-#   %div{"data-no-more-results" => "true"}
+= turbo_stream.append "posts" do
+  = render 'posts'
+= turbo_stream_action_tag "replace",
+  target: "pager",
+  template: %(#{render "pager", pagy: @pagy}) 

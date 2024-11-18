@@ -1,0 +1,9 @@
+%nav.navbar
+  %ul.nav
+    .category-list
+      .container
+        %ul.list-inline.align-top.pull-left
+          - @categories.each do |cliq|
+            %li
+              .cliq
+                = link_to cliq.name, cliq_path(cliq), 'data-turbo-frame': 'main_content','data-turbo-action': 'advance'

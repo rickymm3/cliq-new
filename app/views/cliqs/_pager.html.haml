@@ -1,0 +1,21 @@
+-# #pager.min-w-full.my-8.flex.justify-center
+-#   %div
+-#     - if pagy.next
+-#       = link_to "Load more cards",
+-#         cliqs_path(page: pagy.next),
+-#         class: "",
+-#         data: {turbo_stream: " ", controller: "autoclick"}
+
+#pager.min-w-full.my-8.flex.justify-center
+  %div
+    - if pagy.next
+      -if @parent_cliqs
+        = link_to "Load more cards",
+          cliq_path(cliq, page: pagy.next),
+          class: "",
+          data: {turbo_stream: " ", controller: "autoclick"}
+      -else
+        = link_to "Load more cards",
+          cliqs_path(page: pagy.next),
+          class: "",
+          data: {turbo_stream: " ", controller: "autoclick"}

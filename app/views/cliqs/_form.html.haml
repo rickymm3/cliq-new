@@ -1,0 +1,8 @@
+= simple_form_for cliq, html: { class: "" } do |f|
+  - if cliq.errors.any?
+    .error-message
+      = cliq.errors.full_messages.to_sentence.capitalize
+  = f.input :name, input_html: { autofocus: true }
+  = f.hidden_field :parent_cliq_id, value: parent_cliq.id if parent_cliq
+  = link_to "Cancel", cliqs_path, class: "btn btn--light"
+  = f.submit class: "btn btn--secondary"

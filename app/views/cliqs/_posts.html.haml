@@ -1,0 +1,24 @@
+-# = turbo_frame_tag 'main_content' do
+-#   - if @cliq
+-#     %h2= @cliq.name
+-#     - if @parent_cliqs
+-#       - @parent_cliqs.each do |c|
+-#         .cliq 
+-#           = c.name
+-#     =turbo_frame_tag 'child_cliq_content' do
+-#       = link_to "New Cliq", new_cliq_path(parent_cliq_id: @cliq.id), class: "btn btn--secondary"
+-#     - if @posts.any?
+-#       =render @posts
+-#     - else
+-#       %p No posts yet in this category, Create one now!
+-#       =render "/posts/shared/new_post"
+
+-#   - else
+-#     %p Content not found or loading failed.
+-# = turbo_frame_tag 'main_content' do
+
+= turbo_frame_tag "posts" do
+  - if @posts.any?
+    = render @posts
+  - else
+    %p No posts yet in this category, create one now!

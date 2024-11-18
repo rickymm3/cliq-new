@@ -1,0 +1,30 @@
+%div{ class: "cliq-level" }
+  %strong= link_to cliq.name, cliq_path(cliq), data: { turbo_action: "advance" }
+
+  - if cliq.child_cliqs.any?
+    %ul
+      - cliq.child_cliqs.each do |child_cliq|
+        %li= render partial: 'cliq', locals: { cliq: child_cliq }
+
+
+
+-# .cliq
+-#   = link_to cliq.name, 
+-#     cliq_path(cliq), 
+-#     data: { turbo_action: "advance" }
+
+
+
+-# = turbo_frame_tag cliq do
+-#   .cliq
+-#     = link_to cliq.name,
+-#       cliq_path(cliq),
+-#       data: { turbo_frame: "_top" }
+-#     .cliq__actions
+-#       = button_to "Delete",
+-#         cliq_path(cliq),
+-#         method: :delete,
+-#         class: "btn btn--light"
+-#       = link_to "Edit",
+-#         edit_cliq_path(cliq),
+-#         class: "btn btn--light"

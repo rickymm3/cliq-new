@@ -1,0 +1,24 @@
+= turbo_frame_tag 'main_content' do
+  %p#notice= notice
+  = turbo_frame_tag @post do
+    %p
+      %b Title:
+      = @post.title
+    %p
+      %b Content:
+      = @post.content
+  %p
+    %b Cliq:
+    = @post.cliq_id
+  %p
+    %b User:
+    = @post.user_id
+    = button_to "Delete",
+      post_path(@post),
+      method: :delete,
+      data: { turbo_frame: dom_id(@post, 'actions') },
+      class: "btn btn--light"
+    = link_to "Edit",
+      edit_post_path(@post),
+      data: { turbo_frame: "main_content", turbo_action: 'advance'},
+      class: "btn btn--light"

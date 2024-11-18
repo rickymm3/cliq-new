@@ -1,0 +1,14 @@
+=simple_form_for :cliq,
+  url: new_cliq_path,
+  method: :get,
+  class: "navbar-form navbar-left"  do |f|
+  .input-group
+    =f.search_field :name,
+      type: "search",
+      class: "form-control",
+      placeholder: "Search for a Cliq!",
+      value: nil
+    =f.hidden_field :parent_id, :value => @cliq.id
+    %span.input-group-btn
+      =button_tag type:'submit', class: "btn btn-search", name: nil do
+        %i.fa.fa-search

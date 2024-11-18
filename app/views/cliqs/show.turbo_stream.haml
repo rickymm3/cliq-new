@@ -1,0 +1,4 @@
+= turbo_stream.append "posts" do
+  = render @posts, locals: { cliq: @cliq } 
+= turbo_stream.replace "pager" do
+  = render "pager", pagy: @pagy, cliq: @cliq

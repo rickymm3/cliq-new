@@ -1,0 +1,5 @@
+= cliqs.count
+- cliqs.each do |cliq|
+  %br/
+  = link_to cliq do
+    = highlight(cliq.name, params.dig(:name_search))

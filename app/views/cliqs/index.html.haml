@@ -1,0 +1,9 @@
+-# =render "posts"
+-# = render "posts" # Rendering the posts partial
+
+.mx-auto{class: "w-1/2"}
+  .flex.justify-between.items-center
+    %h1.font-bold.text-4xl Posts
+  #cards.min-w-full
+    = render 'posts'
+  = render "pager", pagy: @pagy
