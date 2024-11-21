@@ -1,24 +1,41 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["input", "results"];
+  static targets = ["input"];
 
   connect() {
-    console.log("SearchController connected"); // Debug log
     this.timeout = null;
+    console.log("SearchController connected");
   }
 
   search() {
-    console.log("Search triggered:", this.inputTarget.value); // Debug log
+    const query = this.inputTarget.value.trim();
+
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
-      this.element.requestSubmit(); // Submits the form automatically
-    }, 300); // Debounce delay
+      this.element.requestSubmit(); // Automatically submits the form
+    }, 200);
   }
 
-  clear() {
-    console.log("Search cleared"); // Debug log
+  clearFormAndHideDropdown(event) {
+    console.log("clearFormAndHideDropdown triggered!");
+
+    // Prevent the default link behavior from interfering
+    event.preventDefault();
+
+    // Clear the search input
     this.inputTarget.value = "";
-    this.resultsTarget.innerHTML = "";
+
+    // Hide the dropdown menu
+    const dropdownMenu = document.querySelector("#cliq-search-results .dropdown-menu");
+    if (dropdownMenu) {
+      dropdownMenu.classList.remove("show");
+    }
+
+    // Trigger Turbo navigation
+    const link = event.target.closest("a");
+    if (link) {
+      link.click();
+    }
   }
 }

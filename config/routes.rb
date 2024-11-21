@@ -2,7 +2,7 @@ Rails.application.routes.draw do
 
   # Home page routes
   get 'home/index'
-  root 'cliqs#index'  # Set the root route to 'home#index'
+  root 'cliqs#show'  # Set the root route to 'home#index'
 
   # Devise routes for user authentication
   devise_for :users, controllers: { 

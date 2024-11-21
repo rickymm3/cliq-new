@@ -1,16 +1,10 @@
 class CliqsController < ApplicationController
   before_action :set_cliq, only: %i[ show edit update destroy]
 
-  # GET /cliqs or /cliqs.json
-
-  # def index
-  #   @cliq = Cliq.find_by(parent_cliq_id: nil)
-  #   @posts = Post.all.order(created_at: :desc).page(params[:page]).per(5)
-  # end
-
   def index
+    #change this to a cliq search page
     @cliq = Cliq.find_by(parent_cliq_id: nil)
-    @pagy, @posts = pagy(Post.ordered, items: 5)
+    @pagy, @posts = pagy(Post.all.ordered)
     respond_to do |format|
       format.html # For regular page load
       format.turbo_stream # For infinite scrolling via Turbo Stream
@@ -23,12 +17,8 @@ class CliqsController < ApplicationController
     if params[:id]
       cliq_ids = @cliq.self_and_descendant_ids
       @pagy, @posts = pagy(Post.where(cliq_id: cliq_ids).ordered)
-    end
-    # if @cliq.parent_cliq_id != @root_category.id
-    #   @parent_cliqs = get_all_parent_cliqs(@cliq)
-    # end
-    if @cliq.nil?
-      render file: "#{Rails.root}/public/404.html", status: :not_found
+    else
+      @pagy, @posts = pagy(Post.all.ordered)
     end
     respond_to do |format|
       format.html # Regular HTML response for initial load or non-Turbo requests
@@ -135,7 +125,11 @@ class CliqsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_cliq
-      @cliq = Cliq.friendly.find(params[:id]) # Use this if 'entertainment' is a slug
+      if params[:id]
+        @cliq = Cliq.friendly.find(params[:id])
+      else
+        @cliq = Cliq.find_by(parent_cliq_id: nil)
+      end
     end
 
     # Only allow a list of trusted parameters through.

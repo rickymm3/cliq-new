@@ -1,0 +1,8 @@
+- if @pagy
+  = turbo_frame_tag "new-cliq" do
+    = link_to "New Cliq", new_cliq_path(parent_cliq_id: @cliq.id), data: { turbo_frame: "new-cliq" }
+  .new-post
+    =render "/posts/shared/new_post"
+.heirarchy
+  -if @parent_cliq
+    =render "/layouts/cliq_bar/parent_cliqs"

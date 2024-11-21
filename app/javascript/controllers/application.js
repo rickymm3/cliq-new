@@ -7,3 +7,12 @@ application.debug = false
 window.Stimulus   = application
 
 export { application }
+
+document.addEventListener("turbo:frame-load", (event) => {
+  console.log("Turbo Frame loaded, Stimulus should already be connected.");
+  const frame = event.target; // The frame that was loaded
+  if (frame.id === "cliq-search-results") {
+    console.log("Turbo Frame 'cliq-search-results' content updated.");
+    // You can run additional logic here if needed
+  }
+});

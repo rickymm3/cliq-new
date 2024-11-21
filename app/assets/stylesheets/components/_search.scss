@@ -16,3 +16,19 @@
 #cliq-search-results li:hover {
   background-color: #f0f0f0;
 }
+
+.dropdown-menu {
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  width: 100%;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa; /* Bootstrap hover color */
+}

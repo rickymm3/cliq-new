@@ -1,5 +1,8 @@
 = turbo_stream.replace "cliq-search-results" do
   %turbo-frame#cliq-search-results
-    %ul
-      - @cliqs.each do |cliq|
-        %li= cliq.name
+    .dropdown-menu.show
+      %ul
+        - if @cliqs.any?
+          - @cliqs.each do |cliq|
+            %li
+              = link_to cliq.name, cliq_path(cliq), data: { action: "click->search#clearFormAndHideDropdown", turbo_frame: "main_content", turbo_action: "advance" }

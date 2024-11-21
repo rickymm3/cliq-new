@@ -1,7 +1,7 @@
 #cliq-search-container
-  = form_with model: @cliq, url: search_cliqs_path, method: :post, data: {controller: "search", turbo_frame: "cliq-search-results" } do |form|
-    = form.text_field :name, placeholder: "Search Cliqs", autocomplete: "off", class: "search-input", data: { target: "search.input", action: "input->search#search" }
-    = form.submit "Search", class: "btn"
+  = form_with model: Cliq.new, url: search_cliqs_path, method: :post, data: {controller: "search", turbo_frame: "cliq-search-results" } do |form|
+    = form.text_field :name, placeholder: "Search Cliqs", autocomplete: "off", class: "search-input for-control dropdown-toggle", data: {search_target: "input", action: "input->search#search" }
+    = form.submit "Search", class: "btn btn-primary d-none"
 
 %turbo-frame#cliq-search-results
-  = render "no_results"
+  .dropdown-menu
