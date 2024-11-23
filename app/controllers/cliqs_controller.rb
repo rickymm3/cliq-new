@@ -37,7 +37,6 @@ class CliqsController < ApplicationController
   end
 
   def search
-
     query = cliq_params[:name] # Use strong parameters for security
     if query.blank?
       render turbo_stream: turbo_stream.replace("cliq-search-results", partial: "cliqs/no_results")
