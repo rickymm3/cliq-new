@@ -12,9 +12,7 @@
     - if current_user && current_user == @post.user
       .post-actions
         = link_to 'Edit', edit_post_path(@post.id), class: 'btn btn-primary'
-
+      = turbo_frame_tag 'new_reply' do
+        =render "replies/new_reply", post: @post
   %h2 Replies
   = render 'replies/replies', replies: @replies
-
-  - if user_signed_in?
-    = render 'replies/form', post: @post, reply: Reply.new

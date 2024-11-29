@@ -39,8 +39,6 @@ class PostsController < ApplicationController
   def show
     @post = Post.friendly.find(params[:post_id])
     @replies = @post.replies.order(created_at: :desc)
-    @reply = Reply.new
-    # Optionally, you can check if the slug matches for SEO or redirect purposes
   end
 
   # GET /posts/new

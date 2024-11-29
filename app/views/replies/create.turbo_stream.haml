@@ -1,5 +1,5 @@
-= turbo_stream.prepend "replies" do
-  .reply
-    %p
-      %strong= @reply.user.username
-      = @reply.content
+= turbo_stream.prepend 'replies' do
+  = render 'replies/reply', reply: @reply
+
+= turbo_stream.replace 'new_reply' do
+  = render 'new_reply', post: @post

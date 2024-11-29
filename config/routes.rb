@@ -16,7 +16,7 @@ Rails.application.routes.draw do
     member do
       get 'edit', to: 'posts#edit'
     end
-    resources :replies, only: [:create, :destroy]
+    resources :replies, only: [:create, :destroy, :new]
 
     # Route for posts with both id and slug - ensure it's after the edit route
     get ':slug', action: 'show', as: :id_slug_post

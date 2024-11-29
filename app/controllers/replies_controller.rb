@@ -1,6 +1,6 @@
 class RepliesController < ApplicationController
   before_action :set_reply, only: %i[ show edit update destroy ]
-  before_action :set_post, only: %i[create]
+  before_action :set_post, only: %i[ create ]
 
   # GET /replies or /replies.json
   def index
@@ -13,7 +13,12 @@ class RepliesController < ApplicationController
 
   # GET /replies/new
   def new
+    @post = Post.friendly.find(params[:post_id])
     @reply = Reply.new
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
   end
 
   # GET /replies/1/edit
@@ -62,7 +67,6 @@ class RepliesController < ApplicationController
   end
 
   private
-
     def set_post
       @post = Post.friendly.find(params[:reply][:post_id])
     end
