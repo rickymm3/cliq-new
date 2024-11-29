@@ -1,0 +1,8 @@
+= turbo_frame_tag "replies" do
+  - @post.replies.each do |reply|
+    .reply
+      %p
+        %strong= reply.user.username
+        = reply.content
+      -# - if reply.user == current_user
+      -#   = link_to 'Delete', post_reply_path(@post, reply), method: :delete, data: { confirm: 'Are you sure?' }

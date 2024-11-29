@@ -11,7 +11,7 @@ gem "haml-rails"
 gem "simple_form", "~> 5.1.0"
 gem 'friendly_id', '~> 5.4'
 gem 'pagy'
-
+gem 'seed_dump'
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 

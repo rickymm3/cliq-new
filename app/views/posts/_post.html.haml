@@ -2,4 +2,7 @@
   .cliq
     = link_to post.cliq.name, cliq_path(post.cliq), data: { turbo_frame: 'main_content', turbo_action: 'advance' }
     = link_to post.title, post_id_slug_post_path(post_id: post.id, slug: post.slug), data: { turbo_frame: 'main_content', turbo_action: 'advance' }
-    .cliq__actions
+    .cliq-actions
+    .post-info 
+      .reply-count
+        =post.replies_count
