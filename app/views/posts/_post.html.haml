@@ -1,6 +1,6 @@
 = turbo_frame_tag dom_id(post) do
   .cliq
-    = link_to post.cliq.name, cliq_path(post.cliq), data: { turbo_frame: 'main_content', turbo_action: 'advance' }
+    = render "cliqs/cliq", cliq: post.cliq
     = link_to post.title, post_id_slug_post_path(post_id: post.id, slug: post.slug), data: { turbo_frame: 'main_content', turbo_action: 'advance' }
     .cliq-actions
     .post-info 

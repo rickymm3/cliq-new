@@ -2,7 +2,7 @@ class Cliq < ApplicationRecord
   extend FriendlyId
   friendly_id :slug_candidates, use: :slugged
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: { scope: :parent_cliq_id, message: "must be unique under the same parent" }
   has_many :posts
   belongs_to :parent_cliq, class_name: 'Cliq', foreign_key: 'parent_cliq_id', optional: true
   has_many :child_cliqs, class_name: 'Cliq', foreign_key: :parent_cliq_id
@@ -22,6 +22,10 @@ class Cliq < ApplicationRecord
 
   def self.search(query)
     where("name ILIKE ?", "%#{query}%") # Use ILIKE for case-insensitive matching
+  end
+  
+  def should_generate_new_friendly_id?
+    name_changed? || parent_cliq_id_changed?
   end
 
 end

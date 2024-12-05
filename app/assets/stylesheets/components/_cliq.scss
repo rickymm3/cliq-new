@@ -23,3 +23,13 @@
     gap: var(--space-xs);
   }
 }
+
+.cliq-info-bar {
+  position: sticky;
+  top: 0; /* Sticks to the top of the viewport */
+  height: 100vh; /* Full viewport height */
+  overflow-y: auto; /* Enables scrolling inside if content exceeds height */
+  background-color: #f8f9fa; /* Optional: Add a light background */
+  padding: 1rem; /* Optional: Add padding for better spacing */
+  border-right: 1px solid #dee2e6; /* Optional: Add a border to separate visually */
+}
