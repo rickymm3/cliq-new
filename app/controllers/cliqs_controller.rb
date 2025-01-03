@@ -16,9 +16,11 @@ class CliqsController < ApplicationController
     @parent_cliqs = get_all_parent_cliqs(@cliq)
     if params[:id]
       cliq_ids = @cliq.self_and_descendant_ids
-      @pagy, @posts = pagy(Post.where(cliq_id: cliq_ids).ordered)
+      # Preload user for each post to display author info without N+1 queries
+      @pagy, @posts = pagy(Post.includes(:user).where(cliq_id: cliq_ids).ordered)  # <-- changed
     else
-      @pagy, @posts = pagy(Post.all.ordered)
+      # Also include user for non-nested scenario
+      @pagy, @posts = pagy(Post.includes(:user).ordered)  # <-- changed
     end
     respond_to do |format|
       format.html # Regular HTML response for initial load or non-Turbo requests

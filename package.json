@@ -15,6 +15,7 @@
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.10",
     "@popperjs/core": "^2.11.8",
+    "@rails/actiontext": "^8.0.100",
     "@rails/request.js": "^0.0.11",
     "autoprefixer": "^10.4.20",
     "bootstrap": "^5.3.3",
@@ -24,7 +25,8 @@
     "postcss": "^8.4.47",
     "postcss-cli": "^11.0.0",
     "sass": "1.77.6",
-    "stimulus-use": "^0.52.2"
+    "stimulus-use": "^0.52.2",
+    "trix": "^2.1.12"
   },
   "browserslist": [
     "defaults"

@@ -1,30 +1,19 @@
--# - if cliq
--#   = cliq.name
--# -else
--#   No Cliq Sent
--# = simple_form_for post, html: { class: "cliq customform" } do |f|
--#   - if post.errors.any?
--#     .error-message
--#       = post.errors.full_messages.to_sentence.capitalize
--#   = f.input :title, input_html: { autofocus: true }
--#   = f.label :content, "Content"
--#   = f.text_field :content
--#   = f.hidden_field :user_id, value: current_user.id if user_signed_in?
--#   = f.hidden_field :cliq_id, value: cliq.id if cliq
--#   -# = link_to "Cancel", posts_path, class: "btn btn--light"
--#   = f.submit class: "btn btn--secondary"
-- if cliq
-  %h2.text-center= cliq.name
-- else
-  %h2.text-center.text-muted No Cliq Sent
-= form_with model: @post, local: true, class: "mb-3" do |form|
+-# app/views/posts/_form.html.haml
+
+-# If you are passing `post` and `cliq` as locals, 
+-# just ensure they are defined above this partial call.
+-# Also ensure `current_user` is available if referencing `user_signed_in?`.
+= form_with model: post, local: true, class: "mb-3" do |form|
   .mb-3
     = form.label :title, class: "form-label"
     = form.text_field :title, class: "form-control", placeholder: "Enter the title of your post"
+
   .mb-3
     = form.label :content, class: "form-label"
-    = form.text_area :content, class: "form-control content-textarea", rows: 10, placeholder: "Write your post here..."
+    = form.rich_text_area :content, class: "form-control content-textarea", placeholder: "Write your post here..."
+
   = form.hidden_field :user_id, value: current_user.id if user_signed_in?
   = form.hidden_field :cliq_id, value: cliq.id if cliq
+
   .d-grid.gap-2
     = form.submit 'Submit', class: "btn btn-primary btn-lg"

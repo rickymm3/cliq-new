@@ -1,8 +1,39 @@
 = turbo_frame_tag dom_id(post) do
-  .cliq
-    = render "cliqs/cliq", cliq: post.cliq
-    = link_to post.title, post_id_slug_post_path(post_id: post.id, slug: post.slug), data: { turbo_frame: 'main_content', turbo_action: 'advance' }
-    .cliq-actions
-    .post-info 
-      .reply-count
-        =post.replies_count
+  .post-card
+    .post-content
+
+      /---- 1. Cliq Breadcrumb (Parent -> Cliq) ----/
+      .post-cliq-location
+        %small
+          This post belongs to 
+          = render "cliqs/parent_cliqs", cliq: post.cliq
+          %span> 
+          = link_to post.cliq.name, cliq_path(post.cliq)
+
+      /---- 2. Post Header (Title + Meta) ----/
+      .post-header
+        .post-title
+          = link_to post.title, post_id_slug_post_path(post_id: post.id, slug: post.slug),
+            data: { turbo_frame: 'main_content', turbo_action: 'advance' }
+        
+        .post-meta
+          %span.post-author
+            = link_to(post.user.username, profile_path(post.user)) if post.user
+          %span.post-date
+            = time_ago_in_words(post.created_at)
+            = " ago"
+
+      /---- 3. Post Body (Truncated) ----/
+      .post-body
+        = post.content
+
+      /---- 4. Footer: Actions + Reply Count ----/
+      .post-footer
+        .post-actions
+          -# If using Pundit or a similar authorization approach
+          -# - if policy(post).edit?
+          -#   = link_to 'Edit', edit_post_path(post), class: 'btn btn-sm btn-secondary'
+
+        .reply-count
+          %i.fa.fa-reply
+          = post.replies_count

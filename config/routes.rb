@@ -36,7 +36,7 @@ Rails.application.routes.draw do
   end
 
   # Profile routes
-  get 'profile' => 'profiles#show', as: :profile
+  get 'profile/:id' => 'profiles#show', as: :profile
   get 'profile/edit' => 'profiles#edit', as: :edit_profile
   patch 'profile' => 'profiles#update'
 

@@ -4,7 +4,7 @@ class Reply < ApplicationRecord
   after_create :update_post_timestamp
 
   validates :content, presence: true
-
+  has_rich_text :content 
   private
 
   def update_post_timestamp

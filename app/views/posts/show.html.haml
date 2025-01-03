@@ -1,5 +1,7 @@
 = turbo_frame_tag 'main_content' do
   .post-container
+    .cliq-back
+      =render "cliqs/cliq", cliq: @post.cliq
     .post-header
       %h1= @post.title
       %p.meta
@@ -8,7 +10,7 @@
         on
         = @post.created_at.strftime("%B %d, %Y")
     .post-content
-      = simple_format(@post.content)
+      = @post.content
     - if current_user && current_user == @post.user
       .post-actions
         = link_to 'Edit', edit_post_path(@post.id), class: 'btn btn-primary'
