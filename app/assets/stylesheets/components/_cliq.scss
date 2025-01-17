@@ -24,15 +24,44 @@
   }
 }
 
-.cliq-info-bar {
-  position: sticky;
-  top: 0; /* Sticks to the top of the viewport */
-  height: 100vh; /* Full viewport height */
-  overflow-y: auto; /* Enables scrolling inside if content exceeds height */
-  background-color: #f8f9fa; /* Optional: Add a light background */
-  padding: 1rem; /* Optional: Add padding for better spacing */
-  border-right: 1px solid #dee2e6; /* Optional: Add a border to separate visually */
+.layout-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
+
+/* Default: Sidebar layout */
+.cliq-info-bar {
+  width: 200px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-right: 1px solid #dee2e6;
+}
+
+/* Posts take full remaining width */
+.posts-info {
+  flex: 1;
+}
+
+/* Mobile: Move .cliq-info-bar above .posts-info */
+@media (max-width: 768px) {
+  .layout-container {
+    flex-direction: column;
+  }
+
+  .cliq-info-bar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+}
+
 
 .cliq-container {
   display: flex;

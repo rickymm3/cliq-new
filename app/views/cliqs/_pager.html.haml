@@ -8,13 +8,16 @@
 
 #pager.min-w-full.my-8.flex.justify-center
   - if pagy.next
-    -if @parent_cliqs
+    - if cliq
       = link_to "Load more posts",
         cliq_path(cliq, page: pagy.next),
         class: "",
-        data: {turbo_stream: " ", controller: "autoclick"}
-    -else
+        data: { turbo_stream: " ", controller: "autoclick", "autoclick-has-next-page": "true" }
+    - else
       = link_to "Load more posts",
         cliqs_path(page: pagy.next),
         class: "",
-        data: {turbo_stream: " ", controller: "autoclick"}
+        data: { turbo_stream: " ", controller: "autoclick", "autoclick-has-next-page": "true" }
+  - else
+    .no-more-posts.text-center.py-4
+      No more posts to load.

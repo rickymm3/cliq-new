@@ -13,7 +13,6 @@ class CliqsController < ApplicationController
 
   # GET /cliqs/slug or /cliqs/1.json
   def show
-    @parent_cliqs = get_all_parent_cliqs(@cliq)
     if params[:id]
       cliq_ids = @cliq.self_and_descendant_ids
       # Preload user for each post to display author info without N+1 queries
@@ -111,16 +110,6 @@ class CliqsController < ApplicationController
     end
   end
 
-  def get_all_parent_cliqs(cliq)
-    parents = []
-    current = cliq
-    while current.parent_cliq
-      current = current.parent_cliq
-      break if current == Cliq.where(name:"Cliq").first
-      parents << current
-    end
-    parents.reverse # To have the direct parent first
-  end
   # end infinite scrolling ---- 
 
 
