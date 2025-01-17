@@ -111,16 +111,16 @@ class CliqsController < ApplicationController
     end
   end
 
-    def get_all_parent_cliqs(cliq)
-      parents = []
-      current = cliq
-      while current.parent_cliq
-        current = current.parent_cliq
-        break if current == Cliq.where(name:"Cliq").first
-        parents << current
-      end
-      parents.reverse # To have the direct parent first
+  def get_all_parent_cliqs(cliq)
+    parents = []
+    current = cliq
+    while current.parent_cliq
+      current = current.parent_cliq
+      break if current == Cliq.where(name:"Cliq").first
+      parents << current
     end
+    parents.reverse # To have the direct parent first
+  end
   # end infinite scrolling ---- 
 
 

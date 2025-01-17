@@ -5,11 +5,7 @@
       /---- 1. Cliq Breadcrumb (Parent -> Cliq) ----/
       .post-cliq-location
         %small
-          This post belongs to 
-          = render "cliqs/parent_cliqs", cliq: post.cliq
-          %span> 
-          = link_to post.cliq.name, cliq_path(post.cliq)
-
+          = render "cliqs/cliq_breadcrumbs", cliq: post.cliq, from_post: true
       /---- 2. Post Header (Title + Meta) ----/
       .post-header
         .post-title

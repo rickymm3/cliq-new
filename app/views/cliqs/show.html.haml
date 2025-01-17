@@ -2,9 +2,8 @@
   .container-fluid
     .row
       .col-lg-3.col-md-4.d-none.d-md-block.cliq-info-bar
-        .cliq
-          = render "cliq", cliq: @cliq
-          = render "parent_cliqs", cliq: @cliq
+        =render "cliq_breadcrumbs"
+
       .col-lg-9.col-md-8.posts-info
         .categories
           = render "posts_header"

@@ -1,5 +1,9 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+@import "@fortawesome/fontawesome-free/scss/fontawesome";
+@import "@fortawesome/fontawesome-free/scss/solid";
+@import "@fortawesome/fontawesome-free/scss/regular";
+@import "@fortawesome/fontawesome-free/scss/brands";
 // Mixins
 @import "mixins/media";
 
@@ -17,4 +21,6 @@
 
 // Layouts
 @import "layouts/container";
-@import "layouts/header";@import 'actiontext.css';
+@import "layouts/header";
+
+@import 'actiontext.css';

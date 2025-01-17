@@ -1,0 +1,10 @@
+/check whether this is to be displayd in a post
+- current_cliq = defined?(from_post) && from_post ? cliq : @cliq
+
+.cliq-container(data-controller="cliq")
+  .cliq-header
+    = render "cliqs/cliq", cliq: current_cliq
+    .cliq-dropdown(data-action="click->cliq#toggleParents")
+      %i.bi.bi-caret-down-fill
+  .cliq-parents.hidden(data-cliq-target="parents")
+    = render "cliqs/parent_cliqs", cliq: current_cliq

@@ -33,3 +33,62 @@
   padding: 1rem; /* Optional: Add padding for better spacing */
   border-right: 1px solid #dee2e6; /* Optional: Add a border to separate visually */
 }
+
+.cliq-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cliq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.cliq-dropdown {
+  margin-left: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.cliq-dropdown i {
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Rotate arrow when dropdown is open */
+.cliq-parents:not(.hidden) + .cliq-dropdown i {
+  transform: rotate(180deg);
+}
+
+
+.cliq-parents {
+  margin-top: 5px;
+  padding-left: 10px;
+  border-left: 3px solid #dee2e6;
+}
+
+.hidden {
+  display: none;
+}
+
+.cliq-level {
+  padding: 5px;
+}
+
+.cliq-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

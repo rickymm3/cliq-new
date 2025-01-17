@@ -1,2 +1,2 @@
-%div{ class: "cliq-level" }
-  = link_to cliq.name, cliq_path(cliq), data: { turbo_frame: 'main_content', turbo_action: 'advance' }
+.cliq-level
+  = link_to cliq.name, cliq_path(cliq), class: "cliq-link", data: { turbo_frame: 'main_content', turbo_action: 'advance' }

@@ -7,6 +7,9 @@ import { application } from "./application"
 import AutoclickController from "./autoclick_controller"
 application.register("autoclick", AutoclickController)
 
+import CliqController from "./cliq_controller"
+application.register("cliq", CliqController)
+
 import FormController from "./form_controller"
 application.register("form", FormController)
 
