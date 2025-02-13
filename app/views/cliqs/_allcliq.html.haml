@@ -1,8 +1,0 @@
-%div{ class: "cliq-level" }
-  %strong
-    = link_to cliq.name, cliq_path(cliq), data: { turbo_action: "advance" }
-
-  - if cliq.child_cliqs.any?
-    %ul
-      - cliq.child_cliqs.each do |child_cliq|
-        %li= render partial: 'cliq', locals: { cliq: child_cliq }

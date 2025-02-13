@@ -6,8 +6,8 @@ Rails.application.routes.draw do
   root 'cliqs#show'  # Set the root route to 'home#index'
 
   # Devise routes for user authentication
-  devise_for :users, controllers: { 
-    registrations: 'users/registrations' 
+  devise_for :users, controllers: {
+    registrations: "users/registrations"
   }
 
   # Resources for posts with a custom path 'p'

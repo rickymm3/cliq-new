@@ -1,5 +1,6 @@
 class CliqsController < ApplicationController
   before_action :set_cliq, only: %i[ show edit update destroy]
+  before_action :authenticate_user!, only: [:new, :create]
 
   def index
     #change this to a cliq search page

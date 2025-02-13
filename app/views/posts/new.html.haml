@@ -1,7 +1,7 @@
 = turbo_frame_tag 'main_content' do
   %main.container
     = "Error" if @error
-    = @cliq.name if @cliq
+    = render "/cliqs/cliq", cliq:@cliq if @cliq
     .header
       %h1 New Post
     = turbo_frame_tag @post do

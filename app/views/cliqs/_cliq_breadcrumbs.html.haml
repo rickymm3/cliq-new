@@ -2,9 +2,10 @@
 
 .cliq-container(data-controller="cliq")
   .cliq-header
-    = render "cliqs/cliq", cliq: cliq
-    - if parent_cliqs.any?
-      .cliq-dropdown(data-action="click->cliq#toggleParents")
-        %i.bi.bi-caret-down-fill
+    .cliq
+      = render "cliqs/cliq", cliq: cliq, parent_cliqs: parent_cliqs
+      - if parent_cliqs.any?
+        .cliq-dropdown(data-action="click->cliq#toggleParents")
+          %i.bi.bi-caret-down-fill
   .cliq-parents.hidden(data-cliq-target="parents")
     = render "cliqs/parent_cliqs", cliq: cliq

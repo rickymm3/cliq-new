@@ -1,0 +1,12 @@
+.top-bar-container.container-fluid
+  %nav.navbar.navbar-expand-lg.bg-body-tertiary
+    .container-fluid
+      .navbar-brand
+        = render "layouts/top/nav/cliq_brand"
+      .d-flex.flex-grow-1.justify-content-center
+        = render "layouts/top/nav/cliq_search"
+      .d-flex.justify-content-end
+        = render "layouts/top/nav/account"
+  %div.bg-light.py-2
+    .container-fluid
+      = render "layouts/top/categories"

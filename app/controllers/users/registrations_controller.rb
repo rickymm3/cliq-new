@@ -20,6 +20,19 @@ class Users::RegistrationsController < Devise::RegistrationsController
     resource.build_profile # This ensures a Profile object is created for the user
     respond_with resource
   end
+  
+  def create
+    build_resource(sign_up_params)
+  
+    resource.build_profile unless resource.profile # Ensure profile is built
+  
+    if resource.save
+      sign_up(resource_name, resource)
+      respond_with resource, location: after_sign_up_path_for(resource)
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
 
   private 
   def sign_up_params

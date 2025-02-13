@@ -1,6 +1,8 @@
 = turbo_frame_tag "main_content" do
   .container-fluid.layout-container
     .cliq-info-bar
+      .new-post
+        =render "/posts/shared/new_post"
       = render "cliq_breadcrumbs", cliq:@cliq
     .posts-info
       .categories

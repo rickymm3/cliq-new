@@ -1,0 +1,10 @@
+= turbo_frame_tag "main_content" do
+  %h2 Login
+  = form_for(resource, as: resource_name, url: session_path(resource_name), html: { method: :post }) do |f|
+    = f.label :email
+    = f.email_field :email, autofocus: true, class: "form-control"
+    
+    = f.label :password
+    = f.password_field :password, autocomplete: "current-password", class: "form-control"
+    
+    = f.submit "Log in", class: "btn btn-primary"

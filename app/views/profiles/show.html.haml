@@ -2,3 +2,9 @@
 %p
   Username: #{@profile.username}
 = link_to "Edit Profile", edit_profile_path
+.profile-user-posts 
+  %br
+  List of #{@profile.username}'s Posts here
+  %ul
+    -@profile.user.posts.limit(10).each do |post|
+      = render "posts/post", post: post
