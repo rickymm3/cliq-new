@@ -1,32 +1,24 @@
+-# app/views/posts/_post.html.haml
+- show_new_badge = local_assigns.key?(:show_new_badge) ? show_new_badge : false
+- post_card_classes = show_new_badge ? "post-card new-replies" : "post-card"
+
 = turbo_frame_tag dom_id(post) do
-  .post-card
+  %div{ class: post_card_classes }
     .post-content
       .post-header
         .post-title
           = link_to post.title, post_id_slug_post_path(post_id: post.id, slug: post.slug),
             data: { turbo_frame: 'main_content', turbo_action: 'advance' }
-        
         .post-meta
           %span.post-author
-            = link_to(post.user.profile.username, profile_path(post.user)) if post.user
-          %span.post-date
-            = time_ago_in_words(post.created_at)
-            = " ago"
-
-      /---- 3. Post Body (Truncated) ----/
-      .post-body
-        = post.content
-
-      /---- 4. Footer: Actions + Reply Count ----/
-      .post-footer
-        .post-actions
-          .post-cliq-location
-            %small
-              = render "cliqs/cliq_breadcrumbs", cliq: post.cliq
-          -# If using Pundit or a similar authorization approach
-          -# - if policy(post).edit?
-          -#   = link_to 'Edit', edit_post_path(post), class: 'btn btn-sm btn-secondary'
-
-        .reply-count
-          %i.fa.fa-reply
-          = post.replies_count
+            = link_to(post.user.profile.username, profile_path(post.user.profile), data: { turbo_frame: "main_content", turbo_action: 'advance'  }) if post.user
+          %span.post-date= time_ago_in_words(post.created_at) + " ago"
+    .post-body
+      = post.content
+    .post-footer
+      .post-actions
+        .post-cliq-location
+          %small= render partial: "cliqs/cliq_breadcrumbs", locals: { cliq: post.cliq }
+      .reply-count
+        %i.fa.fa-reply
+        = post.replies_count

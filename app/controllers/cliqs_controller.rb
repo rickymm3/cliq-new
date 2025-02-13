@@ -3,6 +3,7 @@ class CliqsController < ApplicationController
   before_action :authenticate_user!, only: [:new, :create]
 
   def index
+    @cliqs = [] 
     #change this to a cliq search page
     @cliq = Cliq.find_by(parent_cliq_id: nil)
     @pagy, @posts = pagy(Post.all.ordered)

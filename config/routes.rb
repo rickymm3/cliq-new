@@ -1,43 +1,40 @@
+# config/routes.rb
 Rails.application.routes.draw do
   resources :replies
 
-  # Home page routes
   get 'home/index'
-  root 'cliqs#show'  # Set the root route to 'home#index'
+  root 'cliqs#show'
 
-  # Devise routes for user authentication
   devise_for :users, controllers: {
     registrations: "users/registrations"
   }
 
-  # Resources for posts with a custom path 'p'
   resources :posts, path: 'p', only: [:show, :edit, :new, :update, :create, :index] do
-    # Place the edit route first to prevent conflicts
     member do
       get 'edit', to: 'posts#edit'
     end
     resources :replies, only: [:create, :destroy, :new]
-
-    # Route for posts with both id and slug - ensure it's after the edit route
     get ':slug', action: 'show', as: :id_slug_post
   end
 
-  # Resources for cliqs with a custom path 'c'
   resources :cliqs, path: 'c' do
-    # Custom route for showing all cliqs
     collection do
       get 'all', to: 'cliqs#all'
-    end
-    collection do
       post :search
     end
-    resources :posts, only: [:new]  # New post route within a cliq
-    resources :cliqs, only: [:show, :new, :create], controller: 'cliqs', path: ''  # Nested cliq routes
+    resources :posts, only: [:new]
+    resources :cliqs, only: [:show, :new, :create], controller: 'cliqs', path: ''
   end
 
-  # Profile routes
-  get 'profile/:id' => 'profiles#show', as: :profile
-  get 'profile/edit' => 'profiles#edit', as: :edit_profile
-  patch 'profile' => 'profiles#update'
+  # Resourceful routes for profiles.
+  # With the Profile model’s to_param override, profile_path(@profile) will use the username.
+  resources :profiles, only: [:show, :edit, :update]
 
+  # Routes for following users using the FollowedUser model.
+  post 'follow/:user_id', to: 'followed_users#create', as: :follow_user
+  delete 'unfollow/:user_id', to: 'followed_users#destroy', as: :unfollow_user
+  resources :followed_users, only: [:index]
+
+  # Notifications routes.
+  resources :notifications, only: [:index, :update]
 end

@@ -6,7 +6,8 @@
       %h1= @post.title
       %p.meta
         Posted by
-        %strong= @post.user.username
+        %strong
+          = link_to @post.user.profile.username, profile_path(@post.user.profile)
         on
         = @post.created_at.strftime("%B %d, %Y")
     .post-content

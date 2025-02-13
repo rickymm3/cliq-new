@@ -1,0 +1,5 @@
+-# app/views/followed_users/_follow_button.html.haml
+- if current_user.following?(user)
+  = button_to "Unfollow", unfollow_user_path(user), method: :delete, data: { turbo_frame: "follow_button" }
+- else
+  = button_to "Follow", follow_user_path(user), method: :post, data: { turbo_frame: "follow_button" }

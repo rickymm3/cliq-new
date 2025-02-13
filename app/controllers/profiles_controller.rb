@@ -1,26 +1,38 @@
+# app/controllers/profiles_controller.rb
 class ProfilesController < ApplicationController
   before_action :authenticate_user!
 
   def show
-    @profile = current_user.profile
-  end
+    # Look up the Profile by its username (which is provided as params[:id])
+    @profile = Profile.find_by!(username: params[:id])
+    @user = @profile.user
 
-  def edit
-    @profile = current_user.profile
-  end
+    filter = params[:filter] || 'all'
+    sort   = params[:sort]   || 'recent_activity'
 
-  def update
-    @profile = current_user.profile
-    if @profile.update(profile_params)
-      redirect_to profile_path, notice: 'Profile updated!'
+    if filter == 'posts'
+      @items = @user.posts.order(sort_order(sort))
+    elsif filter == 'replies'
+      @items = @user.replies.order(created_at: :desc)
     else
-      render :edit
+      posts   = @user.posts.to_a
+      replies = @user.replies.to_a
+      @items  = (posts + replies).sort_by { |item| activity_time(item) }.reverse
     end
   end
 
   private
 
-  def profile_params
-    params.require(:profile).permit(:username)
+  def sort_order(sort)
+    case sort
+    when 'created'
+      { created_at: :desc }
+    else
+      { updated_at: :desc }
+    end
+  end
+
+  def activity_time(item)
+    item.is_a?(Post) ? item.updated_at : item.created_at
   end
 end

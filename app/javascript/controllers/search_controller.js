@@ -1,7 +1,8 @@
+// app/javascript/controllers/search_controller.js
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["input"];
+  static targets = ["input", "dropdown"];
 
   connect() {
     this.timeout = null;
@@ -10,32 +11,39 @@ export default class extends Controller {
 
   search() {
     const query = this.inputTarget.value.trim();
-
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
-      this.element.requestSubmit(); // Automatically submits the form
+      const form = this.element.querySelector("form");
+      if (form) {
+        form.requestSubmit();
+      }
+      this.showDropdown();
     }, 200);
   }
 
   clearFormAndHideDropdown(event) {
-    console.log("clearFormAndHideDropdown triggered!");
-
-    // Prevent the default link behavior from interfering
     event.preventDefault();
-
-    // Clear the search input
+    // Clear the search input and force it to lose focus.
     this.inputTarget.value = "";
-
-    // Hide the dropdown menu
-    const dropdownMenu = document.querySelector("#cliq-search-results .dropdown-menu");
-    if (dropdownMenu) {
-      dropdownMenu.classList.remove("show");
+    this.inputTarget.blur();
+    // Hide the dropdown.
+    this.hideDropdown();
+    // Trigger Turbo navigation to the link's href.
+    const link = event.currentTarget;
+    if (link && link.getAttribute("href")) {
+      Turbo.visit(link.getAttribute("href"));
     }
+  }
 
-    // Trigger Turbo navigation
-    const link = event.target.closest("a");
-    if (link) {
-      link.click();
+  hideDropdown() {
+    if (this.hasDropdownTarget) {
+      this.dropdownTarget.classList.remove("show");
+    }
+  }
+
+  showDropdown() {
+    if (this.hasDropdownTarget) {
+      this.dropdownTarget.classList.add("show");
     }
   }
 }

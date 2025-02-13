@@ -1,10 +1,35 @@
-%h2 Your Profile
-%p
-  Username: #{@profile.username}
-= link_to "Edit Profile", edit_profile_path
-.profile-user-posts 
-  %br
-  List of #{@profile.username}'s Posts here
-  %ul
-    -@profile.user.posts.limit(10).each do |post|
-      = render "posts/post", post: post
+-# app/views/profiles/show.html.haml
+-# The controller sets @profile using Profile.find_by!(username: params[:id])
+= turbo_frame_tag 'main_content' do
+  -# Display the profile header using the profile's username
+  %h2= "#{@profile.username.capitalize}'s Profile"
+  %p
+    Username: #{@profile.username}
+  
+  -# Display the follow button if the user is signed in and not viewing their own profile
+  - if user_signed_in? && current_user != @profile.user
+    = turbo_frame_tag "follow_button" do
+      = render partial: "followed_users/follow_button", locals: { user: @profile.user }
+  
+  %nav
+    %ul.profile-filters
+      %li= link_to "All Activity", profile_path(@profile), data: { turbo_frame: "profile_content" }, class: (params[:filter].blank? || params[:filter] == 'all' ? 'active' : '')
+      %li= link_to "My Posts", profile_path(@profile, filter: 'posts'), data: { turbo_frame: "profile_content" }, class: (params[:filter] == 'posts' ? 'active' : '')
+      %li= link_to "My Replies", profile_path(@profile, filter: 'replies'), data: { turbo_frame: "profile_content" }, class: (params[:filter] == 'replies' ? 'active' : '')
+  
+  %div.sort-options
+    %span Sort by:
+    = link_to "Recent Activity", profile_path(@profile, sort: 'recent_activity'), data: { turbo_frame: "profile_content" }
+    |
+    = link_to "Created", profile_path(@profile, sort: 'created'), data: { turbo_frame: "profile_content" }
+  
+  %div.profile-activity
+    - @items.each do |item|
+      - if item.is_a?(Reply)
+        = render partial: "replies/reply_profile", locals: { reply: item }
+      - elsif item.is_a?(Post)
+        = render partial: "posts/post", locals: { post: item, show_new_badge: (item.updated_at > item.created_at) }
+
+  
+  %div.followed-users-link
+    = link_to "Users I Follow", followed_users_path, data: { turbo_frame: "profile_content" }
