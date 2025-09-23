@@ -1,0 +1,12 @@
+-# locals: subscription
+- cliq = subscription.cliq
+= turbo_frame_tag dom_id(subscription) do
+  .flex.items-center.justify-between.py-2.px-3
+    = link_to cliq.name,
+      cliq_path(cliq),
+      class: "text-sm",
+      data: { turbo_frame: "_top", turbo_action: "advance" }
+
+    = link_to "−",
+      confirm_subscription_path(subscription),
+      class: "text-sm text-red-600"

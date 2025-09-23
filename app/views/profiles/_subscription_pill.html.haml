@@ -1,0 +1,19 @@
+-# app/views/profiles/_subscription_pill.html.haml
+-# locals: subscription
+- cliq = subscription.cliq
+- enabled = subscription.enabled
+
+= turbo_frame_tag dom_id(subscription, :pill) do
+  .d-inline-flex.align-items-center.gap-2.me-2.mb-2.subscription-pill{ class: (enabled ? "is-enabled" : "is-disabled") }
+    %span.subscription-pill__name
+    = button_to (enabled ? "Disable" : "Enable"),
+      toggle_subscription_path(subscription),
+      method: :patch,
+      form: { data: { turbo_stream: true } },
+      class: "btn btn-xxs btn-outline-secondary"
+    = button_to "✕",
+      subscription_path(subscription, context: "profile_row"),
+      method: :delete,
+      form: { data: { turbo_stream: true } },
+      class: "btn btn-xxs btn-outline-danger subscription-pill__close",
+      title: "Unsubscribe"

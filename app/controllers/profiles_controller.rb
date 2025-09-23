@@ -3,29 +3,26 @@ class ProfilesController < ApplicationController
   before_action :authenticate_user!
 
   def show
-    # Look up the Profile by its username (which is provided as params[:id])
     @profile = Profile.find_by!(username: params[:id])
-    @user = @profile.user
+    @user    = @profile.user
   
-    # Subscribed cliqs (for the owner) — leave as-is from earlier step if present.
-    if current_user&.id == @user.id
-      @subscriptions = @user.subscriptions.includes(cliq: :parent_cliq) if defined?(Subscription)
-      @subscribed_groups = @user.subscribed_cliqs.includes(:parent_cliq).group_by { |c| c.ancestors.any? ? c.ancestors.first : c } if defined?(Subscription)
+    # (Optional) subscriptions section if you implemented Step 3 earlier
+    if current_user&.id == @user.id && defined?(Subscription)
+      @subscriptions     = @user.subscriptions.includes(cliq: :parent_cliq)
+      @subscribed_groups = @user.subscribed_cliqs.includes(:parent_cliq).group_by { |c| c.ancestors.any? ? c.ancestors.first : c }
     end
   
     filter = params[:filter].presence || 'all'
     sort   = params[:sort].presence   || 'recent_activity'
   
     if filter == 'replies'
-      # Replies remain a simple list for now.
       @items = @user.replies.order(created_at: :desc)
     else
-      # Reuse Cliqs#show logic: latest activity (newest reply OR post created)
       base = Post.where(user_id: @user.id)
-                 .left_joins(:replies)        # bring in replies for MAX()
-                 .group('posts.id')           # needed for the aggregate
+                 .left_joins(:replies)
+                 .group('posts.id')
                  .includes(:user, :cliq)
-                 .reorder(nil)                # clear prior ORDERs
+                 .reorder(nil)
   
       order_expr = 'GREATEST(posts.created_at, COALESCE(MAX(replies.created_at), posts.created_at)) DESC'
       @pagy, @posts = pagy(base.order(Arel.sql(order_expr)))
@@ -36,6 +33,7 @@ class ProfilesController < ApplicationController
       f.turbo_stream
     end
   end
+  
   
   private
 

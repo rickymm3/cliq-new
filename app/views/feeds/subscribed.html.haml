@@ -1,0 +1,24 @@
+-# Global subscribed feed. Must match the target frame used by the nav ("main_content")
+= turbo_frame_tag "main_content" do
+  .container
+    .row.g-4
+      .col-lg-9.offset-lg-1
+        .rounded-2xl.bg-white.shadow-sm.border.border-slate-200.p-5.mb-6
+          .flex.items-center.justify-between.gap-4
+            .min-w-0
+              %h1.text-2xl.font-semibold.tracking-tight.text-slate-900.truncate Subscribed
+              %p.mt-1.text-slate-600.text-sm
+                Posts from cliqs you’re subscribed to
+
+        / Posts list (reuse shared partial)
+        .space-y-4
+          - if @posts.any?
+            = render "cliqs/posts"
+          - else
+            .rounded-xl.border.border-slate-200.bg-white.p-8.text-center.text-slate-500
+              You don’t have any posts here yet.
+
+          / Pagination (shared)
+          = render "cliqs/pager",
+                   pagy: @pagy,
+                   url: subscribed_path(page: @pagy&.next)

@@ -1,36 +1,35 @@
-.container
-  .row.g-4
-    .col-lg-3.d-none.d-lg-block
-      = render "cliqs/sidebar", cliq: @cliq
-    .col-lg-9
-      .rounded-2xl.bg-white.shadow-sm.border.border-slate-200.p-5.mb-6
-        .flex.items-center.justify-between.gap-4
-          .mb-4
-            = render "cliq_breadcrumbs", cliq: @cliq
-          .min-w-0
-            %h1.text-2xl.font-semibold.tracking-tight.text-slate-900.truncate= @cliq.name
-            - if @cliq.respond_to?(:description) && @cliq.description.present?
-              %p.mt-1.text-slate-600.text-sm= @cliq.description
-          .shrink-0.flex.items-center.gap-2
-            = render "subscribe_button", cliq: @cliq
-            = link_to "New Post",
-                      new_post_path(cliq_id: @cliq.id),
-                      class: "btn btn-primary btn-sm",
-                      data: { turbo_frame: "_top", turbo_action: "advance" }
-            = link_to "New Sub-Cliq",
-                      new_cliq_path(parent_cliq_id: @cliq.id),
-                      class: "btn btn-dark btn-sm",
-                      data: { turbo_frame: "_top", turbo_action: "advance" }
+= turbo_frame_tag "main_content" do
+  .container
+    .row.g-4
+      .col-lg-3.d-none.d-lg-block
+        = render "cliqs/sidebar", cliq: @cliq
+      .col-lg-9
+        .rounded-2xl.bg-white.shadow-sm.border.border-slate-200.p-5.mb-6
+          .flex.items-center.justify-between.gap-4
+            .mb-4
+              = render "cliq_breadcrumbs", cliq: @cliq
+            .min-w-0
+              %h1.text-2xl.font-semibold.tracking-tight.text-slate-900.truncate= @cliq.name
+              - if @cliq.respond_to?(:description) && @cliq.description.present?
+                %p.mt-1.text-slate-600.text-sm= @cliq.description
+            .shrink-0.flex.items-center.gap-2
+              = render "subscribe_button", cliq: @cliq
+              = link_to "New Post",
+                        new_post_path(cliq_id: @cliq.id),
+                        class: "btn btn-primary btn-sm",
+                        data: { turbo_frame: "_top", turbo_action: "advance" }
+              = link_to "New Sub-Cliq",
+                        new_cliq_path(parent_cliq_id: @cliq.id),
+                        class: "btn btn-dark btn-sm",
+                        data: { turbo_frame: "_top", turbo_action: "advance" }
 
-      = render "post_filters", cliq: @cliq, scope: params[:scope]
+        / Posts list
+        .space-y-4
+          - if @posts.any?
+            = render "posts"
+          - else
+            .rounded-xl.border.border-slate-200.bg-white.p-8.text-center.text-slate-500
+              No posts yet. Be the first to share something!
 
-      / Posts list
-      .space-y-4
-        - if @posts.any?
-          = render "posts"
-        - else
-          .rounded-xl.border.border-slate-200.bg-white.p-8.text-center.text-slate-500
-            No posts yet. Be the first to share something!
-
-        / Pagination / Infinite scroll frame (stays at bottom, updates as you load)
-        = render "pager", pagy: @pagy, cliq: @cliq
+          / Pagination / Infinite scroll frame (stays at bottom, updates as you load)
+          = render "pager", pagy: @pagy, cliq: @cliq

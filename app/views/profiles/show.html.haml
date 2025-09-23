@@ -1,16 +1,19 @@
 -# app/views/profiles/show.html.haml
 -# The controller sets @profile using Profile.find_by!(username: params[:id])
 = turbo_frame_tag 'profile_content' do
-  -# Display the profile header using the profile's username
   %h2= "#{@profile.username.capitalize}'s Profile"
   %p
     Username: #{@profile.username}
-  
-  -# Display the follow button if the user is signed in and not viewing their own profile
+
   - if user_signed_in? && current_user != @profile.user
     = turbo_frame_tag "follow_button" do
       = render partial: "followed_users/follow_button", locals: { user: @profile.user }
-  
+
+  -# Subscribed Cliqs section (only when viewing your own profile)
+  - if current_user&.id == @user.id
+    = render "profiles/subscriptions", user: @user
+
+
   %nav
     %ul.profile-filters
       %li{ class: (params[:filter].blank? || params[:filter] == 'all' ? 'active' : '') }
@@ -21,16 +24,23 @@
         = link_to "Replies", profile_path(@profile, filter: 'replies'), data: { turbo_frame: "profile_content" }
 
     %span Sort by:
-    = link_to "Recent Activity", profile_path(@profile, sort: 'recent_activity'), data: { turbo_frame: "profile_content" }
+    = link_to "Recent Activity", profile_path(@profile, sort: 'recent_activity', filter: params[:filter]), data: { turbo_frame: "profile_content" }
     |
-    = link_to "Created", profile_path(@profile, sort: 'created'), data: { turbo_frame: "profile_content" }
-  
-  %div.profile-activity
-    - @items.each do |item|
-      - if item.is_a?(Reply)
-        = render partial: "replies/reply_profile", locals: { reply: item }
-      - elsif item.is_a?(Post)
-        = render partial: "posts/post", locals: { post: item, show_new_badge: (item.updated_at > item.created_at) }
+    = link_to "Created", profile_path(@profile, sort: 'created', filter: params[:filter]), data: { turbo_frame: "profile_content" }
 
-  %div.followed-users-link
+  -# Activity content
+  - if params[:filter] == 'replies'
+    .profile-activity
+      - @items.each do |item|
+        = render partial: "replies/reply_profile", locals: { reply: item }
+  - else
+    -# Use the shared posts list (wraps in turbo_frame_tag "posts")
+    = render "cliqs/posts"
+
+    -# Shared pager; explicit URL to keep params
+    = render "cliqs/pager",
+             pagy: @pagy,
+             url: profile_path(@profile, filter: params[:filter], sort: params[:sort], page: @pagy&.next)
+
+  .followed-users-link
     = link_to "Users I Follow", followed_users_path, data: { turbo_frame: "profile_content" }

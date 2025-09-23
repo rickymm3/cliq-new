@@ -23,8 +23,13 @@ Rails.application.routes.draw do
     member do
       get :confirm
       get :row
+      patch :toggle   # ← enable/disable without unsubscribing
+
     end
   end
+
+  get "subscribed", to: "feeds#subscribed", as: :subscribed
+
 
   resources :cliqs, path: 'c' do
     collection do
