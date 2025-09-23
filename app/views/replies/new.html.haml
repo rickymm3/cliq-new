@@ -1,6 +1,4 @@
-= turbo_frame_tag "new_reply" do
-  %h3 New reply
-
-  = render 'form'
-
-  = link_to 'Back', replies_path
+- frame_id = params[:frame_id].presence || "new_reply"
+= turbo_frame_tag frame_id do
+  - unless params[:cancel].present?
+    = render 'form'

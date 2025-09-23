@@ -6,6 +6,10 @@ class Cliq < ApplicationRecord
   has_many :posts
   belongs_to :parent_cliq, class_name: 'Cliq', foreign_key: 'parent_cliq_id', optional: true
   has_many :child_cliqs, class_name: 'Cliq', foreign_key: :parent_cliq_id
+
+  has_many :subscriptions, dependent: :destroy
+  has_many :subscribers, through: :subscriptions, source: :user
+
   alias_attribute :parent, :parent_cliq
   def slug_candidates
     [
@@ -26,6 +30,21 @@ class Cliq < ApplicationRecord
   
   def should_generate_new_friendly_id?
     name_changed? || parent_cliq_id_changed?
+  end
+
+  def ancestors
+    nodes = []
+    current = self
+    while current.parent_cliq
+      current = current.parent_cliq
+      break if current.name == "Cliq" # stop at umbrella/root
+      nodes << current
+    end
+    nodes.reverse
+  end
+  #subscirptions
+  def root_or_self
+    ancestors.any? ? ancestors.first : self
   end
 
 end

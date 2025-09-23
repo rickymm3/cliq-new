@@ -1,12 +1,37 @@
-- if user_signed_in?
-  .nav-item.dropdown
-    %a.nav-link.dropdown-toggle{"aria-expanded" => "false", "data-bs-toggle" => "dropdown", :href => "#", :role => "button"}
-      = current_user.profile.username.capitalize
-    %ul.dropdown-menu.dropdown-menu-end
-      %li= link_to "Profile", profile_path(current_user.profile), class: "dropdown-item"
-      %li= link_to "Sign Out", destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "dropdown-item"
-- else
-  %li.nav-item
-    = link_to "Login", new_user_session_path, class: "nav-link", data: { turbo_frame: "main_content" }
-  %li.nav-item
-    = link_to "Sign Up", new_user_registration_path, class: "nav-link", data: { turbo_frame: "main_content" }
+-# Renders in the top navbar. Bootstrap-first, no Tailwind required.
+= turbo_frame_tag "account_nav" do
+  - if user_signed_in?
+    .dropdown
+      %button.btn.btn-outline-secondary.btn-sm.dropdown-toggle{ data: { bs_toggle: "dropdown" }, aria: { expanded: "false" } }
+        - uname = current_user&.profile&.username || current_user&.email || "Account"
+        - initial = uname.to_s.first&.upcase || "U"
+        %span.me-2.avatar-circle{ style: "display:inline-flex;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;background:#0f172a;color:#fff;font-size:12px;" }= initial
+        %span= uname
+      %ul.dropdown-menu.dropdown-menu-end
+        %li
+          = link_to "Profile",
+                    (current_user.profile ? profile_path(current_user.profile) : "#"),
+                    class: "dropdown-item",
+                    data: { turbo_frame: "_top", turbo_action: "advance" }
+        %li
+          = link_to "Settings", edit_user_registration_path,
+                    class: "dropdown-item",
+                    data: { turbo_frame: "_top", turbo_action: "advance" }
+        %li
+          %hr.dropdown-divider
+        %li
+          = button_to "Sign out",
+                      destroy_user_session_path,
+                      method: :delete,
+                      class: "dropdown-item",
+                      form: { data: { turbo_frame: "_top", turbo_action: "advance" } }
+  - else
+    .d-flex.gap-2
+      = link_to "Log in",
+                new_user_session_path,
+                class: "btn btn-outline-secondary btn-sm",
+                data: { turbo_frame: "_top", turbo_action: "advance" }
+      = link_to "Sign up",
+                new_user_registration_path,
+                class: "btn btn-primary btn-sm",
+                data: { turbo_frame: "_top", turbo_action: "advance" }

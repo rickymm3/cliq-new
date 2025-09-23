@@ -1,6 +1,6 @@
 -# app/views/profiles/show.html.haml
 -# The controller sets @profile using Profile.find_by!(username: params[:id])
-= turbo_frame_tag 'main_content' do
+= turbo_frame_tag 'profile_content' do
   -# Display the profile header using the profile's username
   %h2= "#{@profile.username.capitalize}'s Profile"
   %p
@@ -13,11 +13,13 @@
   
   %nav
     %ul.profile-filters
-      %li= link_to "All Activity", profile_path(@profile), data: { turbo_frame: "profile_content" }, class: (params[:filter].blank? || params[:filter] == 'all' ? 'active' : '')
-      %li= link_to "My Posts", profile_path(@profile, filter: 'posts'), data: { turbo_frame: "profile_content" }, class: (params[:filter] == 'posts' ? 'active' : '')
-      %li= link_to "My Replies", profile_path(@profile, filter: 'replies'), data: { turbo_frame: "profile_content" }, class: (params[:filter] == 'replies' ? 'active' : '')
-  
-  %div.sort-options
+      %li{ class: (params[:filter].blank? || params[:filter] == 'all' ? 'active' : '') }
+        = link_to "All Activity", profile_path(@profile), data: { turbo_frame: "profile_content" }
+      %li{ class: (params[:filter] == 'posts' ? 'active' : '') }
+        = link_to "Posts", profile_path(@profile, filter: 'posts'), data: { turbo_frame: "profile_content" }
+      %li{ class: (params[:filter] == 'replies' ? 'active' : '') }
+        = link_to "Replies", profile_path(@profile, filter: 'replies'), data: { turbo_frame: "profile_content" }
+
     %span Sort by:
     = link_to "Recent Activity", profile_path(@profile, sort: 'recent_activity'), data: { turbo_frame: "profile_content" }
     |
@@ -30,6 +32,5 @@
       - elsif item.is_a?(Post)
         = render partial: "posts/post", locals: { post: item, show_new_badge: (item.updated_at > item.created_at) }
 
-  
   %div.followed-users-link
     = link_to "Users I Follow", followed_users_path, data: { turbo_frame: "profile_content" }

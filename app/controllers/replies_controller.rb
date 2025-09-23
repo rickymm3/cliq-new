@@ -1,84 +1,105 @@
 class RepliesController < ApplicationController
-  before_action :set_reply, only: %i[ show edit update destroy ]
-  before_action :set_post, only: %i[ create ]
-  before_action :authenticate_user!, only: [:new, :create]
+  before_action :authenticate_user!, except: [:show]
+  before_action :set_reply, only: [:show, :edit, :update, :destroy]
+  before_action :set_post_for_new, only: [:new]
+  before_action :set_post_for_create, only: [:create]
 
-  # GET /replies or /replies.json
-  def index
-    @replies = Reply.all
-  end
-
-  # GET /replies/1 or /replies/1.json
   def show
   end
 
-  # GET /replies/new
   def new
-    @post = Post.friendly.find(params[:post_id])
-    @reply = Reply.new
+    @parent_reply = Reply.find_by(id: params[:parent_reply_id])
+    @reply = Reply.new(post: @post, user: current_user, parent_reply: @parent_reply)
+
+    # Block replying to a child reply (only top-level replies can be replied to)
+    if @parent_reply&.parent_reply_id.present?
+      frame_id = params[:frame_id].presence || "new_reply"
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            frame_id,
+            partial: "replies/locked_reply_slot",
+            locals: { parent: @parent_reply, message: "You can only reply directly to a top-level reply." }
+          )
+        end
+        format.html { redirect_to post_path(@post), alert: "You can only reply directly to a top-level reply." }
+      end
+      return
+    end
+
     respond_to do |format|
       format.turbo_stream
       format.html
     end
   end
 
-  # GET /replies/1/edit
-  def edit
-  end
-
-  # POST /replies or /replies.json
   def create
-    @reply = @post.replies.build(reply_params)
+    @reply = Reply.new(reply_params)
     @reply.user = current_user
-    @reply.post =  # Assuming replies are nested under posts
+
     if @reply.save
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to @post, notice: 'Reply was successfully created.' }
+        format.html { redirect_to post_path(@reply.post), notice: "Reply was successfully created." }
       end
     else
+      frame_id = params[:frame_id].presence ||
+                 (@reply.parent_reply_id ? "reply_form_#{@reply.parent_reply_id}" : "new_reply")
+
+      parent = @reply.parent_reply || Reply.find_by(id: @reply.parent_reply_id)
+      is_depth_error = @reply.errors.full_messages.any? { |m| m =~ /only reply to a top-level reply/i }
+
       respond_to do |format|
-        format.turbo_stream { render turbo_stream: turbo_stream.replace('reply_form', partial: 'replies/form', locals: { post: @post, reply: @reply }) }
-        format.html { render 'posts/show', status: :unprocessable_entity }
+        if parent && is_depth_error
+          format.turbo_stream do
+            render turbo_stream: turbo_stream.replace(
+              frame_id,
+              partial: "replies/locked_reply_slot",
+              locals: { parent: parent, message: "You can only reply directly to a top-level reply." }
+            ), status: :unprocessable_entity
+          end
+          format.html { redirect_to post_path(@reply.post), alert: "You can only reply directly to a top-level reply." }
+        else
+          format.turbo_stream { render :new, status: :unprocessable_entity }
+          format.html        { render :new, status: :unprocessable_entity }
+        end
       end
     end
   end
 
-  # PATCH/PUT /replies/1 or /replies/1.json
+  def edit
+  end
+
   def update
-    respond_to do |format|
-      if @reply.update(reply_params)
-        format.html { redirect_to @reply, notice: "Reply was successfully updated." }
-        format.json { render :show, status: :ok, location: @reply }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @reply.errors, status: :unprocessable_entity }
-      end
+    if @reply.update(reply_params)
+      redirect_to post_path(@reply.post), notice: "Reply was successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
-  # DELETE /replies/1 or /replies/1.json
   def destroy
+    post = @reply.post
     @reply.destroy
-
-    respond_to do |format|
-      format.html { redirect_to replies_path, status: :see_other, notice: "Reply was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    redirect_to post_path(post), notice: "Reply was successfully destroyed."
   end
 
   private
-    def set_post
-      @post = Post.friendly.find(params[:reply][:post_id])
-    end
 
-    # Use callbacks to share common setup or constraints between actions.
-    def set_reply
-      @reply = Reply.find(params[:id])
-    end
+  def set_reply
+    @reply = Reply.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def reply_params
-      params.require(:reply).permit(:content, :post_id, :user_id)
-    end
+  def set_post_for_new
+    key = params[:post_id]
+    @post = Post.find_by(slug: key) || Post.find_by(id: key)
+  end
+
+  def set_post_for_create
+    @post = Post.find(reply_params[:post_id])
+  end
+
+  def reply_params
+    params.require(:reply).permit(:content, :post_id, :parent_reply_id)
+  end
 end

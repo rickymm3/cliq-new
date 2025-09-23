@@ -1,0 +1,16 @@
+-# Simple, extensible filter bar for the cliq posts list.
+-# Locals: cliq:, scope:
+- current_scope = (scope || "cliq")
+
+%div.mb-4
+  .inline-flex.items-center.gap-2.text-sm
+    = link_to "This Cliq",
+      cliq_path(cliq, scope: nil),
+      class: "btn btn-sm #{'btn-dark' if current_scope == 'cliq'}",
+      data: { turbo_frame: "_top", turbo_action: "advance" }
+
+    - if user_signed_in?
+      = link_to "Subscribed",
+        cliq_path(cliq, scope: "subscribed"),
+        class: "btn btn-sm #{'btn-dark' if current_scope == 'subscribed'}",
+        data: { turbo_frame: "_top", turbo_action: "advance" }

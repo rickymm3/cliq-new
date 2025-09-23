@@ -17,6 +17,10 @@ class User < ApplicationRecord
   has_many :followed_users, through: :active_followed_users, source: :followed
   has_many :followers, through: :passive_followed_users, source: :follower
 
+  has_many :subscriptions, dependent: :destroy
+  has_many :subscribed_cliqs, through: :subscriptions, source: :cliq
+  
+
   # Follows another user (if not self and not already following)
   def follow(other_user)
     return if self == other_user || following?(other_user)
@@ -32,5 +36,14 @@ class User < ApplicationRecord
   # Returns true if following the other user
   def following?(other_user)
     followed_users.exists?(other_user.id)
+  end
+
+  def subscribed_to?(cliq)
+    return false unless cliq
+    subscribed_cliq_ids.include?(cliq.id)
+  end
+  
+  def subscribed_cliq_ids
+    @subscribed_cliq_ids ||= subscriptions.pluck(:cliq_id)
   end
 end

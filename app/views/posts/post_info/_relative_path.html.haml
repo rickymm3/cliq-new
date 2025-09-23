@@ -1,0 +1,4 @@
+-# locals: post:, current_cliq:
+- trail = relative_trail_links(current_cliq, post.cliq)
+- if trail.present?
+  %div.post-path= trail

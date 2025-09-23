@@ -45,6 +45,10 @@
 
 .post-content {
   flex: 1; /* Let the content expand as needed */
+  border: 1px solid #000000;
+  border-radius: 4px;
+
+  margin-bottom: 5px;
 
   .post-header {
     margin-bottom: 0.5rem;
@@ -94,6 +98,11 @@
     align-items: center;
 
     .post-actions {
+
+      .post-edit {
+        background-color: red!important;
+        margin: 10px;
+      }
       /* Add spacing for any action buttons/links */
       a {
         margin-right: 0.5rem;

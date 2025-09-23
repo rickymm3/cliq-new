@@ -1,9 +1,8 @@
 class CliqsController < ApplicationController
   before_action :set_cliq, only: %i[ show edit update destroy]
   before_action :authenticate_user!, only: [:new, :create]
-
+  
   def index
-    @cliqs = [] 
     #change this to a cliq search page
     @cliq = Cliq.find_by(parent_cliq_id: nil)
     @pagy, @posts = pagy(Post.all.ordered)
@@ -15,27 +14,39 @@ class CliqsController < ApplicationController
 
   # GET /cliqs/slug or /cliqs/1.json
   def show
-    if params[:id]
-      cliq_ids = @cliq.self_and_descendant_ids
-      # Preload user for each post to display author info without N+1 queries
-      @pagy, @posts = pagy(Post.includes(:user).where(cliq_id: cliq_ids).ordered)  # <-- changed
-    else
-      # Also include user for non-nested scenario
-      @pagy, @posts = pagy(Post.includes(:user).ordered)  # <-- changed
-    end
-    respond_to do |format|
-      format.html # Regular HTML response for initial load or non-Turbo requests
-      format.turbo_stream # Optional, if you want to handle updates via Turbo Stream
+    cliq_ids = @cliq.self_and_descendant_ids rescue [@cliq.id]
+  
+    base = Post.where(cliq_id: cliq_ids)
+               .left_joins(:replies)        # bring in replies for MAX()
+               .group('posts.id')           # needed for the aggregate
+               .includes(:user, :cliq)
+               .reorder(nil)                # IMPORTANT: clear any prior ORDERs (e.g., from scopes)
+  
+    # Order by “latest activity” (newest reply OR post creation if no replies)
+    order_expr = 'GREATEST(posts.created_at, COALESCE(MAX(replies.created_at), posts.created_at)) DESC'
+  
+    @pagy, @posts = pagy(base.order(Arel.sql(order_expr)))
+  
+    respond_to do |f|
+      f.html
+      f.turbo_stream
     end
   end
-
+  
   # GET /cliqs/new
   def new
-    @cliq = Cliq.new
     @parent_cliq = Cliq.find_by(id: params[:parent_cliq_id]) if params[:parent_cliq_id]
+    @cliq = Cliq.new(parent_cliq: @parent_cliq)
+  
+    # Limit depth: count ancestors of the chosen parent + this new level
+    if @parent_cliq && (@parent_cliq.ancestors.size + 1) > 5
+      flash[:alert] = "Cliq hierarchy too deep, for now"
+      redirect_back(fallback_location: cliq_path(@parent_cliq)) and return
+    end
+  
     respond_to do |format|
-      format.html # Regular HTML response for initial load or non-Turbo requests
-      format.turbo_stream # Optional, if you want to handle updates via Turbo Stream
+      format.html
+      format.turbo_stream
     end
   end
 
@@ -65,13 +76,20 @@ class CliqsController < ApplicationController
   # POST /cliqs or /cliqs.json
   def create
     @cliq = Cliq.new(cliq_params)
+    @parent_cliq = @cliq.parent_cliq
+  
     if @cliq.save
       respond_to do |format|
-        format.turbo_stream
-        format.html { redirect_to cliq_path(@cliq), notice: 'Cliq was successfully created.' }
+        format.html        { redirect_to cliq_path(@cliq), notice: "Cliq created." }
+        format.turbo_stream { redirect_to cliq_path(@cliq), status: :see_other }
+        format.json        { render :show, status: :created, location: @cliq }
       end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html         { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render :new, status: :unprocessable_entity }
+        format.json         { render json: @cliq.errors, status: :unprocessable_entity }
+      end
     end
   end
 

@@ -1,8 +1,27 @@
+-# app/views/cliqs/_form.html.haml
+-# Locals: cliq:, parent_cliq:
+
 = simple_form_for cliq, html: { class: "" } do |f|
   - if cliq.errors.any?
-    .error-message
+    .alert.alert-danger
       = cliq.errors.full_messages.to_sentence.capitalize
-  = f.input :name, input_html: { autofocus: true }
+
+  - if parent_cliq
+    .mb-2.small.text-muted
+      Creating under:
+    .mb-3
+      = render "cliqs/cliq_breadcrumbs", cliq: parent_cliq
+
   = f.hidden_field :parent_cliq_id, value: parent_cliq.id if parent_cliq
-  = link_to "Cancel", cliqs_path, class: "btn btn--light"
-  = f.submit class: "btn btn--secondary"
+
+  = f.input :name,
+            label: "Cliq name",
+            input_html: { autofocus: true, placeholder: "e.g., Movies" },
+            hint: "Must be unique under the selected parent."
+
+  .d-flex.gap-2.mt-3
+    = link_to "Cancel",
+              (parent_cliq ? cliq_path(parent_cliq) : root_path),
+              class: "btn btn-outline-secondary",
+              data: { turbo_frame: "_top", turbo_action: "advance" }
+    = f.submit "Create Cliq", class: "btn btn-primary"

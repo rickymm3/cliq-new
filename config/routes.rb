@@ -6,15 +6,24 @@ Rails.application.routes.draw do
   root 'cliqs#show'
 
   devise_for :users, controllers: {
-    registrations: "users/registrations"
+    registrations: "users/registrations",
+    sessions: "users/sessions"
   }
 
   resources :posts, path: 'p', only: [:show, :edit, :new, :update, :create, :index] do
     member do
       get 'edit', to: 'posts#edit'
+      patch :soft_delete 
     end
     resources :replies, only: [:create, :destroy, :new]
     get ':slug', action: 'show', as: :id_slug_post
+  end
+
+  resources :subscriptions, only: [:create, :destroy] do
+    member do
+      get :confirm
+      get :row
+    end
   end
 
   resources :cliqs, path: 'c' do
@@ -22,6 +31,7 @@ Rails.application.routes.draw do
       get 'all', to: 'cliqs#all'
       post :search
     end
+    
     resources :posts, only: [:new]
     resources :cliqs, only: [:show, :new, :create], controller: 'cliqs', path: ''
   end

@@ -1,11 +1,10 @@
-#!/usr/bin/env sh
 
-if gem list --no-installed --exact --silent foreman; then
-  echo "Installing foreman..."
-  gem install foreman
-fi
+echo "Starting Rails, JS, and CSS dev servers..."
 
-# Default to port 3000 if not specified
-export PORT="${PORT:-3000}"
+trap 'kill 0' SIGINT
 
-exec foreman start -f Procfile.dev --env /dev/null "$@"
+bin/rails server -p 3000 &
+yarn build --watch &
+yarn build:css --watch &
+
+wait

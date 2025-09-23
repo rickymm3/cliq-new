@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_02_13_194742) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_23_154839) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -83,6 +83,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_13_194742) do
     t.datetime "updated_at", null: false
     t.string "slug"
     t.integer "replies_count", default: 0, null: false
+    t.boolean "deleted", default: false, null: false
     t.index ["slug"], name: "index_posts_on_slug", unique: true
   end
 
@@ -100,8 +101,20 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_13_194742) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "parent_reply_id"
+    t.index ["parent_reply_id"], name: "index_replies_on_parent_reply_id"
     t.index ["post_id"], name: "index_replies_on_post_id"
     t.index ["user_id"], name: "index_replies_on_user_id"
+  end
+
+  create_table "subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "cliq_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cliq_id"], name: "index_subscriptions_on_cliq_id"
+    t.index ["user_id", "cliq_id"], name: "index_subscriptions_on_user_id_and_cliq_id", unique: true
+    t.index ["user_id"], name: "index_subscriptions_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -123,5 +136,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_13_194742) do
   add_foreign_key "followed_users", "users", column: "follower_id"
   add_foreign_key "profiles", "users"
   add_foreign_key "replies", "posts"
+  add_foreign_key "replies", "replies", column: "parent_reply_id"
   add_foreign_key "replies", "users"
+  add_foreign_key "subscriptions", "cliqs"
+  add_foreign_key "subscriptions", "users"
 end

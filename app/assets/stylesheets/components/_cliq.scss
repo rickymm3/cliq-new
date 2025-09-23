@@ -1,113 +1,87 @@
-// app/assets/stylesheets/components/_cliq.scss
+// Ensure the CSS arrow mixin is present or import it
+@import "hierarchy_dropdown"; // provides css-arrow mixin
 
-.cliq {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-s);
-
-  background-color: var(--color-white);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-small);
-  margin-bottom: var(--space-m);
-  padding: var(--space-xs);
-
-  @include media(tabletAndUp) {
-    padding: var(--space-xs) var(--space-m);
-  }
-
-  &__actions {
-    display: flex;
-    flex: 0 0 auto;
-    align-self: flex-start;
-    gap: var(--space-xs);
-  }
-}
-
-
-.layout-container {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-}
-
-/* Default: Sidebar layout */
-.cliq-info-bar {
-  width: 200px;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-  background: #f8f9fa;
-  padding: 1rem;
-  border-right: 1px solid #dee2e6;
-}
-
-/* Posts take full remaining width */
-.posts-info {
-  flex: 1;
-}
-
-/* Mobile: Move .cliq-info-bar above .posts-info */
-@media (max-width: 768px) {
-  .layout-container {
-    flex-direction: column;
-  }
-
-  .cliq-info-bar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid #dee2e6;
-  }
-}
-
-.cliq-header {
-  align-items: center;
-  justify-content: space-between;
-  background: #f8f9fa;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.cliq-dropdown {
-  margin-left: 8px;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
-.cliq-dropdown i {
-  transition: transform 0.2s ease-in-out;
-}
-
-/* Rotate arrow when dropdown is open */
-.cliq-parents:not(.hidden) + .cliq-dropdown i {
-  transform: rotate(180deg);
-}
-
-
-.cliq-parents {
-  margin-top: 5px;
-  padding-left: 10px;
-  border-left: 3px solid #dee2e6;
-}
-
-.hidden {
-  display: none;
-}
-
-.cliq-level {
-  padding: 5px;
-}
-
-.cliq-link {
-  color: #007bff;
+// Standalone Cliq link
+.cliq-link-only {
+  color: #333;
   text-decoration: none;
-  font-weight: 600;
+  &:hover { text-decoration: underline; }
+}
 
-  &:hover {
-    text-decoration: underline;
+// Dropdown container
+.cliq-dropdown {
+  position: relative;
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 14px;
+
+  &__toggle {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .caret-right {
+      margin-left: 8px;
+      font-size: 12px;
+      color: #666;
+    }
+  }
+
+  &__options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+    display: none;
+    z-index: 1000;
+
+    &.open { display: block; }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      li {
+        & + li { margin-top: -1px; }
+
+        // All dropdown items with arrow
+        .cliq-in-dropdown-arrow,
+        .cliq-in-dropdown-bottom {
+          display: block;
+          width: 100%;
+          padding: 8px 12px;
+          background: #fff;
+          text-decoration: none;
+          color: #c00;
+          position: relative;
+          border: 1px solid #ccc;
+        }
+
+        // Arrow for non-final items
+        .cliq-in-dropdown-arrow {
+          cursor: pointer;
+          @include css-arrow(6px, 1px, #fff, #ccc);
+        }
+
+        // Final item: no arrow, rounded bottom, dark text
+        .cliq-in-dropdown-bottom {
+          @include css-arrow(0, 0, transparent, transparent);
+          border-bottom-left-radius: 6px;
+          border-bottom-right-radius: 6px;
+          color: #333;
+          font-weight: bold;
+        }
+      }
+    }
   }
 }

@@ -16,3 +16,11 @@ document.addEventListener("turbo:frame-load", (event) => {
     // You can run additional logic here if needed
   }
 });
+
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.cliq-dropdown').forEach(drop => {
+    if (!drop.contains(e.target)) {
+      drop.querySelector('.cliq-dropdown__options').classList.remove('open');
+    }
+  });
+});

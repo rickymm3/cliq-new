@@ -31,3 +31,6 @@
 
 en:
   hello: "Hello world"
+  posts:
+    deleted_message: "Post has been deleted"
+    deleted_notice: "Post deleted."

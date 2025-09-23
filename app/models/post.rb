@@ -23,13 +23,15 @@ class Post < ApplicationRecord
   private
 
   def notify_followers
-    # Create a notification for each follower
-    user.followers.find_each do |follower|
-      Notification.create!(
-        user: follower,
-        notifiable: self,
-        message: "#{user.profile.username} posted a new update"
-      )
-    end
+    # Skip if notifications table doesn't exist (e.g., during seeds on a fresh DB)
+    return unless ActiveRecord::Base.connection.data_source_exists?('notifications')
+
+    # user.followers.find_each do |follower|
+    #   Notification.create!(
+    #     user: follower,
+    #     notifiable: self,
+    #     message: "#{user.profile.username} posted a new update"
+    #   )
+    # end
   end
 end

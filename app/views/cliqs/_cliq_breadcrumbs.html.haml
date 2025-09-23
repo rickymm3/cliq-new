@@ -1,11 +1,37 @@
-- parent_cliqs = get_all_parent_cliqs(cliq)
+- ancestors = cliq.respond_to?(:ancestors) ? cliq.ancestors : get_all_parent_cliqs(cliq)
 
-.cliq-container(data-controller="cliq")
-  .cliq-header
-    .cliq
-      = render "cliqs/cliq", cliq: cliq, parent_cliqs: parent_cliqs
-      - if parent_cliqs.any?
-        .cliq-dropdown(data-action="click->cliq#toggleParents")
-          %i.bi.bi-caret-down-fill
-  .cliq-parents.hidden(data-cliq-target="parents")
-    = render "cliqs/parent_cliqs", cliq: cliq
+%nav.breadcrumbs{ aria: { label: "Breadcrumb" } }
+  %ol.breadcrumb{ role: "list" }
+    %li.breadcrumb__item
+      = link_to "Home", root_path,
+        class: "breadcrumb__link",
+        data: { turbo_frame: "_top", turbo_action: "advance" }
+
+    - ancestors.each do |parent|
+      %li.breadcrumb__separator /
+      %li.breadcrumb__item
+        = link_to parent.name, cliq_path(parent),
+          class: "breadcrumb__link",
+          data: { turbo_frame: "_top", turbo_action: "advance" }
+
+    %li.breadcrumb__separator /
+    %li.breadcrumb__item.breadcrumb__current
+      = link_to cliq.name, cliq_path(cliq),
+        class: "breadcrumb__link breadcrumb__link--current",
+        aria: { current: "page" },
+        data: { turbo_frame: "_top", turbo_action: "advance" }
+
+/ Umbrella / path quick-jump (native <details>, no JS)
+-# .details-container
+-#   %details.breadcrumb-umbrella
+-#     %summary
+-#       %span Cliqs in this path
+-#     .dropdown
+-#       %ul
+-#         %li= link_to 'Home', root_path,
+-#           data: { turbo_frame: "_top", turbo_action: "advance" }
+-#         - ancestors.each do |parent|
+-#           %li= link_to parent.name, cliq_path(parent),
+-#             data: { turbo_frame: "_top", turbo_action: "advance" }
+-#         %li.current= link_to cliq.name, cliq_path(cliq),
+-#           data: { turbo_frame: "_top", turbo_action: "advance" }

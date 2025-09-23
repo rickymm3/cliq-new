@@ -58,21 +58,40 @@ class PostsController < ApplicationController
     @cliq = @post.cliq
   end
 
+  def soft_delete
+    @post = Post.find(params[:id])
+    # If you use Pundit, uncomment:
+    # authorize @post
+  
+    @post.update!(deleted: true)
+  
+    target = post_id_slug_post_path(post_id: @post.id, slug: @post.slug)
+    respond_to do |format|
+      format.html        { redirect_to target, notice: I18n.t("posts.deleted_notice") }
+      format.turbo_stream { redirect_to target, status: :see_other }
+    end
+  end
+
   # POST /posts or /posts.json
   def create
     @post = Post.new(post_params)
-    @post.user = current_user
-    @post.cliq = Cliq.find(params[:post][:cliq_id]) if params[:post][:cliq_id]
-
+    @cliq = @post.cliq
+  
     if @post.save
+      # Use your slugged route helper (matches how links are built in views)
+      target = post_id_slug_post_path(post_id: @post.id, slug: @post.slug)
+  
       respond_to do |format|
-        format.turbo_stream do
-          # Render the full `show` view, not a partial
-          render turbo_stream: turbo_stream.replace('main_content', template: 'posts/show')
-        end
+        format.html         { redirect_to target, notice: "Post created." }
+        format.turbo_stream { redirect_to target, status: :see_other }
+        format.json         { render :show, status: :created, location: target }
       end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html         { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render :new, status: :unprocessable_entity }
+        format.json         { render json: @post.errors, status: :unprocessable_entity }
+      end
     end
   end
 

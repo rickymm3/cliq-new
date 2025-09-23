@@ -1,0 +1,21 @@
+-# Renders the subscribe/unsubscribe toggle for a cliq inside a Turbo frame.
+-# Locals: cliq:
+- subscribed = current_user&.subscribed_to?(cliq)
+
+= turbo_frame_tag dom_id(cliq, :subscribe_button) do
+  - if current_user.nil?
+    = link_to "Sign in to subscribe", new_user_session_path, class: "btn btn-sm"
+  - elsif subscribed
+    - subscription = current_user.subscriptions.find_by(cliq_id: cliq.id)
+    = button_to "Unsubscribe",
+      subscription_path(subscription),
+      method: :delete,
+      params: { context: "cliq_button" },
+      form: { data: { turbo_frame: dom_id(cliq, :subscribe_button) } },
+      class: "btn btn-outline btn-sm"
+  - else
+    = button_to "Subscribe",
+      subscriptions_path(cliq_id: cliq.id),
+      method: :post,
+      form: { data: { turbo_frame: dom_id(cliq, :subscribe_button) } },
+      class: "btn btn-outline btn-sm"
