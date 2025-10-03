@@ -18,6 +18,7 @@
             label: "Cliq name",
             input_html: { autofocus: true, placeholder: "e.g., Movies" },
             hint: "Must be unique under the selected parent."
+  = render partial: "posts/form", locals: { post: @post, cliq: @cliq, new_cliq:true }
 
   .d-flex.gap-2.mt-3
     = link_to "Cancel",

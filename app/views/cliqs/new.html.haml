@@ -1,53 +1,15 @@
--# New Cliq – full page layout (Bootstrap)
+-# app/views/cliqs/new.html.haml
 
-.container.py-4
-  -# Context header: if creating under a parent, show its breadcrumb path
+%main.container.py-4
   - if @parent_cliq
     .mb-3
-      %h1.h4.mb-1 Create a new Cliq
-      %div.text-muted.small
-        You’re creating this cliq under:
+      %h1.h4.mb-1 Create a new Cliq under
       = render "cliqs/cliq_breadcrumbs", cliq: @parent_cliq
   - else
     .mb-3
       %h1.h4.mb-1 Create a new top-level Cliq
-      %div.text-muted.small
-        Top-level cliqs appear on the home page.
 
-  .row.g-4
-    .col-lg-8
-      .card.shadow-sm
-        .card-header.bg-white
-          %strong Details
-        .card-body
-          = render "form", cliq: @cliq, parent_cliq: @parent_cliq
-
-    .col-lg-4
-      .card.shadow-sm
-        .card-header.bg-white
-          %strong Context
-        .card-body
-          - if @parent_cliq
-            %div.mb-2
-              %span.text-muted.small Parent path
-              = render "cliqs/cliq_breadcrumbs", cliq: @parent_cliq
-            - depth = @parent_cliq.ancestors.size + 1
-            - max_depth = 5
-            - if depth >= max_depth
-              .alert.alert-warning.p-2.small.mb-3
-                Max depth reached (#{max_depth}). Choose a different parent.
-            - elsif depth == (max_depth - 1)
-              .alert.alert-info.p-2.small.mb-3
-                You’re at depth #{depth} of #{max_depth - 1}. One more level allowed.
-          - else
-            .text-muted.small
-              This will be a root cliq. You can add sub-cliqs later.
-
-      .card.shadow-sm.mt-3
-        .card-header.bg-white
-          %strong Naming tips
-        .card-body
-          %ul.list-unstyled.small.mb-0
-            %li.mb-1 Keep it short and specific (e.g., <em>Movies</em>, <em>PC Gaming</em>).
-            %li.mb-1 Avoid duplicates at the same level — names must be unique under the same parent.
-            %li.mb-1 You can add sub-cliqs later for finer organization.
+  .card.shadow-sm
+    .card-body
+      = render partial: "posts/form",
+               locals: { post: (@post || Post.new), parent_cliq: @parent_cliq, new_cliq_mode: true }

@@ -12,6 +12,8 @@ class Cliq < ApplicationRecord
   has_many :subscribers, through: :subscriptions, source: :user
 
   alias_attribute :parent, :parent_cliq
+  accepts_nested_attributes_for :posts
+
 
   def slug_candidates
     [

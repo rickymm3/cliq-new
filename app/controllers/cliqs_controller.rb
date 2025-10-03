@@ -35,19 +35,9 @@ class CliqsController < ApplicationController
   
   # GET /cliqs/new
   def new
-    @parent_cliq = Cliq.find_by(id: params[:parent_cliq_id]) if params[:parent_cliq_id]
-    @cliq = Cliq.new(parent_cliq: @parent_cliq)
-  
-    # Limit depth: count ancestors of the chosen parent + this new level
-    if @parent_cliq && (@parent_cliq.ancestors.size + 1) > 5
-      flash[:alert] = "Cliq hierarchy too deep, for now"
-      redirect_back(fallback_location: cliq_path(@parent_cliq)) and return
-    end
-  
-    respond_to do |format|
-      format.html
-      format.turbo_stream
-    end
+    # Parent cliq context (optional)
+    @parent_cliq = Cliq.find_by(id: params[:parent_cliq_id])
+    @post = Post.new
   end
 
   def search

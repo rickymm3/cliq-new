@@ -1,8 +1,9 @@
 -# app/views/posts/_form.html.haml
 
--# If you are passing `post` and `cliq` as locals, 
--# just ensure they are defined above this partial call.
--# Also ensure `current_user` is available if referencing `user_signed_in?`.
+- if post.errors.any?
+  .alert.alert-danger.mb-3
+    = post.errors.full_messages.uniq.to_sentence
+
 = form_with model: post, local: true, class: "mb-3" do |form|
   .mb-3
     = form.label :title, class: "form-label"
@@ -12,8 +13,27 @@
     = form.label :content, class: "form-label"
     = form.rich_text_area :content, class: "form-control content-textarea", placeholder: "Write your post here..."
 
-  = form.hidden_field :user_id, value: current_user.id if user_signed_in?
-  = form.hidden_field :cliq_id, value: cliq.id if cliq
+  - if local_assigns[:new_cliq_mode]
+    .mt-4.p-3.border.rounded.bg-light
+      %h6.mb-2 New Cliq
+      - if defined?(parent_cliq) && parent_cliq
+        .mb-2
+          This cliq will be created under:
+          %strong= parent_cliq.name
+        = form.hidden_field :new_cliq_parent_id, value: parent_cliq.id
+      - else
+        .mb-2
+          This cliq will be created at the root level.
 
-  .d-grid.gap-2
+      .mb-3
+        = form.label :new_cliq_name, "New cliq name", class: "form-label"
+        = form.text_field :new_cliq_name, class: "form-control", placeholder: "e.g., Earthquakes"
+  - else
+    - if defined?(cliq) && cliq
+      = form.hidden_field :cliq_id, value: cliq.id
+      .mb-2.small.text-muted
+        Posting to:
+        %strong= cliq.name
+
+  .d-grid.gap-2.mt-4
     = form.submit 'Submit', class: "btn btn-primary btn-lg"

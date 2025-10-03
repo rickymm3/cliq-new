@@ -44,12 +44,8 @@ class PostsController < ApplicationController
 
   # GET /posts/new
   def new
-    if params[:cliq_id]
-      @cliq = Cliq.find(params[:cliq_id])
-    else
-      @error = "Error"
-    end
-    @post = Post.new
+    @cliq = Cliq.find_by(id: params[:cliq_id]) if params[:cliq_id].present?
+    @post = @post || Post.new  # if coming from a failed render, @post is already set
   end
 
   # GET /posts/1/edit
@@ -74,39 +70,103 @@ class PostsController < ApplicationController
 
   # POST /posts or /posts.json
   def create
-    @post = Post.new(post_params)
-    @cliq = @post.cliq
+    @post = Post.new(post_params.except(:new_cliq_name, :new_cliq_parent_id))
+    @post.user = current_user
   
-    if @post.save
-      # Use your slugged route helper (matches how links are built in views)
-      target = post_id_slug_post_path(post_id: @post.id, slug: @post.slug)
+    new_name = post_params[:new_cliq_name].to_s.strip
+    parent   = post_params[:new_cliq_parent_id].present? ? Cliq.find_by(id: post_params[:new_cliq_parent_id]) : nil
   
-      respond_to do |format|
-        format.html         { redirect_to target, notice: "Post created." }
-        format.turbo_stream { redirect_to target, status: :see_other }
-        format.json         { render :show, status: :created, location: target }
+    if new_name.present?
+      # Duplicate pre-check
+      if Cliq.exists?(name: new_name, parent_cliq: parent)
+        @parent_cliq = parent
+        msg = "Cliq “#{new_name}” already exists under #{parent ? "“#{parent.name}”" : "the root"}"
+        @post.errors.add(:base, msg)
+        flash.now[:alert] = msg
+  
+        respond_to do |format|
+          format.html         { render 'cliqs/new', status: :unprocessable_entity }
+          format.turbo_stream { render 'cliqs/new', status: :unprocessable_entity }
+        end
+        return
+      end
+  
+      ActiveRecord::Base.transaction do
+        cliq = Cliq.new(name: new_name, parent_cliq: parent)
+        unless cliq.save
+          @parent_cliq = parent
+          msg = cliq.errors.full_messages.to_sentence
+          @post.errors.add(:base, msg)
+          flash.now[:alert] = msg
+          raise ActiveRecord::RecordInvalid, @post
+        end
+  
+        @post.cliq = cliq
+        @post.save!
       end
     else
-      respond_to do |format|
-        format.html         { render :new, status: :unprocessable_entity }
-        format.turbo_stream { render :new, status: :unprocessable_entity }
-        format.json         { render json: @post.errors, status: :unprocessable_entity }
+      if @post.cliq_id.blank? || !Cliq.exists?(@post.cliq_id)
+        @cliq = Cliq.find_by(id: post_params[:cliq_id])
+        msg = "Please choose a cliq or create a new one."
+        @post.errors.add(:cliq, msg)
+        flash.now[:alert] = msg
+  
+        respond_to do |format|
+          format.html         { render :new, status: :unprocessable_entity }
+          format.turbo_stream { render :new, status: :unprocessable_entity }
+        end
+        return
       end
+  
+      ActiveRecord::Base.transaction { @post.save! }
+    end
+  
+    target = post_id_slug_post_path(post_id: @post.id, slug: @post.slug)
+    respond_to do |format|
+      format.html         { redirect_to target, notice: "Post created." }
+      format.turbo_stream { redirect_to target, status: :see_other }
+      format.json         { render :show, status: :created, location: target }
+    end
+  rescue ActiveRecord::RecordInvalid
+    if new_name.present?
+      @parent_cliq = parent
+      render 'cliqs/new', status: :unprocessable_entity
+    else
+      @cliq = @post.cliq || Cliq.find_by(id: post_params[:cliq_id])
+      render :new, status: :unprocessable_entity
     end
   end
+  
 
   # PATCH/PUT /posts/1 or /posts/1.json
   def update
-    @post = Post.friendly.find(params[:id]) 
+    @post = Post.friendly.find(params[:id])
+  
     if @post.update(post_params)
+      # Ensure replies are available for the show template
+      @replies = @post.replies.order(created_at: :desc)
+  
       respond_to do |format|
+        # Turbo edit -> replace main_content with the full show view (now with replies)
         format.turbo_stream do
-          # Render the full `show` view, not a partial
           render turbo_stream: turbo_stream.replace('main_content', template: 'posts/show')
         end
+  
+        # Non-Turbo / HTML edit -> go to the canonical post URL
+        format.html do
+          target = post_id_slug_post_path(post_id: @post.id, slug: @post.slug)
+          redirect_to target, notice: "Post updated."
+        end
+  
+        # Optional JSON
+        format.json { render :show, status: :ok, location: @post }
       end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
+        format.html         { render :edit, status: :unprocessable_entity }
+        format.json         { render json: @post.errors, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -128,7 +188,10 @@ class PostsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def post_params
-      params.require(:post).permit(:title, :content, :cliq_id, :user_id)
+      params.require(:post).permit(
+        :title, :content, :cliq_id,
+        :new_cliq_name, :new_cliq_parent_id
+      )
     end
 
 end
