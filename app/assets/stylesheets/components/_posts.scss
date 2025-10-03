@@ -1,11 +1,11 @@
 /* app/assets/stylesheets/posts.scss */
 
 .post-card {
-  display: flex;
+  // display: flex;
   align-items: flex-start;
   border: 1px solid #e1e1e1;
   border-radius: 4px;
-  padding: 1rem;
+  // padding: 1rem;
   margin-bottom: 1rem;
   background-color: #fff;
 }
@@ -22,8 +22,8 @@
 }
 
 .post-cliq-location {
-  margin-bottom: 0.5rem;
   font-size: 0.9rem;
+  border-bottom: 1px solid #e5e7eb; /* neutral divider */
 
   %small {
     color: #666;
@@ -45,9 +45,9 @@
 
 .post-content {
   flex: 1; /* Let the content expand as needed */
-  border: 1px solid #000000;
+  // border: 1px solid #000000;
   border-radius: 4px;
-
+  padding: 0rem 1rem 1rem 1rem;
   margin-bottom: 5px;
 
   .post-header {

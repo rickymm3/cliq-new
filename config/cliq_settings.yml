@@ -1,0 +1,18 @@
+# Global defaults live under "default" and are merged into each environment.
+default:
+  colors:
+    umbrella: "#64748b"        # used when the top-most parent is "Cliq" or unknown
+    entertainment: "#ef4444"   # red-500
+    science: "#10b981"         # emerald-500
+    gaming: "#3b82f6"          # blue-500
+    politics: "#f59e0b"        # amber-500
+
+development:
+  # override here if you want different colors in dev
+  colors: {}
+
+test:
+  colors: {}
+
+production:
+  colors: {}

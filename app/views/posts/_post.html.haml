@@ -4,22 +4,25 @@
 
 = turbo_frame_tag dom_id(post) do
   %div{ class: post_card_classes }
-    .post-content
-      .post-header
-        =render partial: "posts/post_info/author", locals: {post: post}
-        .post-title
-          = link_to post.title,
-            post_id_slug_post_path(post_id: post.id, slug: post.slug),
-            data: { turbo_frame: "_top", turbo_action: "advance" }
-      .post-body
-        - if post.deleted?
-          .alert.alert-warning.mb-0= t("posts.deleted_message")
-        - else
-          = post.content
-      .post-footer
-        .post-actions
-          .post-cliq-location
-            %small= render "posts/post_info/relative_path", post: post, current_cliq: @cliq
-        .reply-count
-          %i.fa.fa-reply
-          = post.replies_count
+    .post
+      .post-actions
+        .post-cliq-location
+          = render "posts/post_info/path_header", post: post
+      .post-content
+        .post-header
+          .post-title
+            = link_to post.title,
+              post_id_slug_post_path(post_id: post.id, slug: post.slug),
+              data: { turbo_frame: "_top", turbo_action: "advance" }
+        .post-body
+          - if post.deleted?
+            .alert.alert-warning.mb-0= t("posts.deleted_message")
+          - else
+            = post.content
+        .post-footer
+          .post-author
+            = 'by'
+            = render partial: "posts/post_info/author", locals: { post: post }
+          .reply-count
+            %i.fa.fa-reply
+            = post.replies_count

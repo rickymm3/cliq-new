@@ -1,0 +1,21 @@
+/* Make the Flex row not vertically stretch children (helps sticky inside flex) */
+@media (min-width: 992px) { /* Bootstrap lg */
+  .row.g-4 { align-items: flex-start; }
+}
+
+/* Sticky columns */
+@media (min-width: 992px) {
+  .sidebar-left,
+  .sidebar-right {
+    position: sticky;
+    top: 72px;            /* adjust to your header height */
+    align-self: flex-start;
+    height: max-content;  /* avoid stretching */
+    z-index: 2;           /* stay above content shadows if needed */
+  }
+}
+
+/* In case any ancestor was killing sticky with overflow */
+.container, .main {
+  overflow: visible;  /* ensure sticky can calculate against the viewport */
+}
