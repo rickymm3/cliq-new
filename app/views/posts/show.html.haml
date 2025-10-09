@@ -3,47 +3,7 @@
 .container.py-4
   .row
     .col-lg-9.mx-auto
-      .card.shadow-sm.post-show
-        .card-body
-          .d-flex.align-items-start.justify-content-between.gap-3
-            .min-w-0
-              %h1.h4.mb-1.text-truncate= @post.title
-              .text-muted.small
-                = render "posts/post_info/posted_on", post: @post
-            -# (actions moved to footer; nothing in the top-right now)
-
-        - if @post.deleted?
-          .card-body.border-top
-            .alert.alert-warning.mb-0= t("posts.deleted_message")
-        - else
-          .card-body.border-top
-            .post-content
-              = @post.content
-
-        / Footer with Reply (left) and ... dropdown (right)
-        .card-footer.bg-white.border-top
-          .d-flex.align-items-center.justify-content-between
-            = link_to "Reply",
-                      new_post_reply_path(@post),
-                      class: "btn btn-primary btn-sm",
-                      data: { turbo_frame: "new_reply" }
-
-            .dropdown
-              %button.btn.btn-outline-secondary.btn-sm{ data: { bs_toggle: "dropdown" }, aria: { expanded: "false" } }
-                %i.bi.bi-three-dots-vertical
-              %ul.dropdown-menu.dropdown-menu-end
-                - if current_user && current_user == @post.user
-                  %li
-                    = link_to "Edit",
-                              edit_post_path(@post.id), 
-                              class: "dropdown-item",
-                              data: { turbo_frame: "_top", turbo_action: "advance" }
-                  %li
-                    = button_to "Delete",
-                                soft_delete_post_path(@post.id),
-                                method: :patch,
-                                class: "dropdown-item text-danger",
-                                form: { data: { turbo_confirm: "Delete this post?", turbo_frame: "_top", turbo_action: "advance" } }
+      = render partial: "posts/post", locals: { post: @post, full_view: true }
 
       / Inline reply form target (appears here when clicking Reply)
       = turbo_frame_tag "new_reply"

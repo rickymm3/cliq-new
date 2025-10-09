@@ -1,46 +1,24 @@
 -# app/views/profiles/show.html.haml
 -# The controller sets @profile using Profile.find_by!(username: params[:id])
 = turbo_frame_tag 'profile_content' do
-  %h2= "#{@profile.username.capitalize}'s Profile"
-  %p
-    Username: #{@profile.username}
+  = render 'profiles/header', profile: @profile, owner: @owner_viewing
+  = render 'profiles/nav', profile: @profile, owner: @owner_viewing, current_section: @section
 
-  - if user_signed_in? && current_user != @profile.user
-    = turbo_frame_tag "follow_button" do
-      = render partial: "followed_users/follow_button", locals: { user: @profile.user }
+  .profile-section
+    .d-flex.align-items-center.gap-2.mb-3
+      %span.text-muted Sort by:
+      = link_to "Recent Activity",
+                profile_path(@profile, sort: 'recent_activity'),
+                class: (@sort == 'recent_activity' ? 'fw-semibold' : ''),
+                data: { turbo_frame: 'profile_content', turbo_action: 'advance' }
+      %span.text-muted •
+      = link_to "Created",
+                profile_path(@profile, sort: 'created'),
+                class: (@sort == 'created' ? 'fw-semibold' : ''),
+                data: { turbo_frame: 'profile_content', turbo_action: 'advance' }
 
-  -# Subscribed Cliqs section (only when viewing your own profile)
-  - if current_user&.id == @user.id
-    = render "profiles/subscriptions", user: @user
-
-
-  %nav
-    %ul.profile-filters
-      %li{ class: (params[:filter].blank? || params[:filter] == 'all' ? 'active' : '') }
-        = link_to "All Activity", profile_path(@profile), data: { turbo_frame: "profile_content" }
-      %li{ class: (params[:filter] == 'posts' ? 'active' : '') }
-        = link_to "Posts", profile_path(@profile, filter: 'posts'), data: { turbo_frame: "profile_content" }
-      %li{ class: (params[:filter] == 'replies' ? 'active' : '') }
-        = link_to "Replies", profile_path(@profile, filter: 'replies'), data: { turbo_frame: "profile_content" }
-
-    %span Sort by:
-    = link_to "Recent Activity", profile_path(@profile, sort: 'recent_activity', filter: params[:filter]), data: { turbo_frame: "profile_content" }
-    |
-    = link_to "Created", profile_path(@profile, sort: 'created', filter: params[:filter]), data: { turbo_frame: "profile_content" }
-
-  -# Activity content
-  - if params[:filter] == 'replies'
-    .profile-activity
-      - @items.each do |item|
-        = render partial: "replies/reply_profile", locals: { reply: item }
-  - else
-    -# Use the shared posts list (wraps in turbo_frame_tag "posts")
-    = render "cliqs/posts"
-
-    -# Shared pager; explicit URL to keep params
-    = render "cliqs/pager",
-             pagy: @pagy,
-             url: profile_path(@profile, filter: params[:filter], sort: params[:sort], page: @pagy&.next)
-
-  .followed-users-link
-    = link_to "Users I Follow", followed_users_path, data: { turbo_frame: "profile_content" }
+    - if @posts.present?
+      = render 'cliqs/posts'
+      = render 'cliqs/pager', pagy: @pagy, url: @next_page_url
+    - else
+      %p.text-muted.mb-0 No activity yet.

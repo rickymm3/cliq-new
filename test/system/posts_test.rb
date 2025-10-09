@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class PostsTest < ApplicationSystemTestCase
   setup do
-    @post = posts(:one)
+    @post = posts(:discussion_post)
   end
 
   test "visiting the index" do

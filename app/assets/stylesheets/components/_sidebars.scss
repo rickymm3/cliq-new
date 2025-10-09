@@ -1,21 +1,167 @@
-/* Make the Flex row not vertically stretch children (helps sticky inside flex) */
-@media (min-width: 992px) { /* Bootstrap lg */
-  .row.g-4 { align-items: flex-start; }
+/* Cliq show layout with responsive, sticky sidebars */
+
+.cliq-layout {
+  --sidebar-width: 280px;
+  --layout-gap: 1.5rem;
+  --layout-top-offset: 72px;
+
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--layout-gap);
+  padding: 1.5rem 1rem 2rem;
+  width: 100%;
 }
 
-/* Sticky columns */
-@media (min-width: 992px) {
-  .sidebar-left,
-  .sidebar-right {
-    position: sticky;
-    top: 72px;            /* adjust to your header height */
-    align-self: flex-start;
-    height: max-content;  /* avoid stretching */
-    z-index: 2;           /* stay above content shadows if needed */
+.cliq-layout__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+
+
+.cliq-layout__side {
+  flex: 0 0 var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  transition: flex-basis 0.25s ease, max-width 0.25s ease, opacity 0.25s ease;
+  overflow: visible;
+  position: relative;
+}
+
+.cliq-layout__sidebar {
+  position: sticky;
+  top: var(--layout-top-offset);
+  height: max-content;
+}
+
+.cliq-layout__content-top {
+  margin-bottom: 1.5rem;
+  display: none;
+}
+
+.cliq-layout__side.is-collapsed {
+  flex-basis: 0;
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cliq-layout__side.is-collapsed .cliq-layout__sidebar {
+  visibility: hidden;
+}
+
+.cliq-layout__toggle {
+  position: absolute;
+  top: calc(var(--layout-top-offset) + 8px);
+  z-index: 30;
+  border-radius: 999px;
+  box-shadow: 0 1rem 2rem -1.3rem rgba(15, 23, 42, 0.5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.5rem;
+}
+
+.cliq-layout__toggle--left {
+  left: calc(var(--sidebar-width) - 16px);
+}
+
+.cliq-layout__toggle--right {
+  right: calc(var(--sidebar-width) - 16px);
+}
+
+.cliq-layout.has-left-collapsed .cliq-layout__toggle--left {
+  left: -16px;
+}
+
+.cliq-layout.has-right-collapsed .cliq-layout__toggle--right {
+  right: -16px;
+}
+
+.cliq-layout__mobile-toggle {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 40;
+  box-shadow: 0 1rem 2.5rem -1.3rem rgba(15, 23, 42, 0.45);
+}
+
+/* Overlay behaviour on narrower widths */
+@media (max-width: 1199.98px) {
+  .cliq-layout__content-top {
+    display: block;
+  }
+
+  .cliq-layout__side--right {
+    display: none !important;
   }
 }
 
-/* In case any ancestor was killing sticky with overflow */
-.container, .main {
-  overflow: visible;  /* ensure sticky can calculate against the viewport */
+@media (max-width: 991.98px) {
+  .cliq-layout {
+    flex-wrap: nowrap;
+  }
+
+  .cliq-layout__side--left {
+    flex-basis: 0 !important;
+    max-width: 0 !important;
+  }
+
+  .cliq-layout__side--left.is-overlay {
+    position: fixed;
+    top: calc(var(--layout-top-offset) + 8px);
+    left: 1rem;
+    bottom: 1.5rem;
+    width: 90vw;
+    max-width: none;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 1.5rem 3rem -1.5rem rgba(15, 23, 42, 0.65);
+    padding: 1rem;
+    overflow-y: auto;
+    z-index: 35;
+    transform: translateX(-120%);
+    opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  .cliq-layout__side--left.is-overlay .cliq-layout__sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .cliq-layout__side--left.is-overlay:not(.is-collapsed) {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cliq-layout__side--left.is-overlay.is-collapsed {
+    pointer-events: none;
+  }
+
+  .cliq-layout__toggle--left,
+  .cliq-layout__toggle--right {
+    display: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .cliq-layout {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .cliq-layout__mobile-toggle {
+    width: calc(100% - 1.5rem);
+    left: 0.75rem;
+    right: 0.75rem;
+    text-align: center;
+  }
+}
+
+/* Ensure sticky calculations work */
+.cliq-layout,
+.cliq-layout__content {
+  overflow: visible;
 }

@@ -1,22 +1,21 @@
 class Users::SessionsController < Devise::SessionsController
-  # Devise 4.9+ with Turbo: use 303 See Other after POST/DELETE
-  def create
-    super do |resource|
-      target = after_sign_in_path_for(resource)
-      respond_to do |format|
-        format.html { return redirect_to(target) }
-        format.turbo_stream { return redirect_to(target, status: :see_other) }
-      end
+  respond_to :html, :turbo_stream
+
+  private
+
+  def respond_with(resource, _opts = {})
+    if request.format.turbo_stream? && resource.respond_to?(:errors) && resource.errors.empty?
+      redirect_to(after_sign_in_path_for(resource), status: :see_other)
+    else
+      super
     end
   end
 
-  def destroy
-    super do
-      target = after_sign_out_path_for(resource_name)
-      respond_to do |format|
-        format.html { return redirect_to(target) }
-        format.turbo_stream { return redirect_to(target, status: :see_other) }
-      end
+  def respond_to_on_destroy
+    if request.format.turbo_stream?
+      redirect_to(after_sign_out_path_for(resource_name), status: :see_other)
+    else
+      super
     end
   end
 end

@@ -8,9 +8,17 @@ class Post < ApplicationRecord
   has_many :replies, dependent: :destroy
   has_rich_text :content
 
-  scope :ordered, -> { order(updated_at: :desc) }
+  # 👇 Make the type explicit so enum never complains
+  attribute :post_type, :integer, default: 0
 
-  after_create :notify_followers  # NEW: Callback to create notifications
+  # Backed by posts.post_type (integer)
+  enum post_type: { discussion: 0, article: 1, question: 2 }
+
+  scope :ordered, -> { order(updated_at: :desc) }
+  scope :articles, -> { where(post_type: :article) }  # ← convenience
+
+  after_create :notify_followers
+  after_commit :notify_followers_of_article, on: :create
 
   def title_truncated
     title.truncate(20, omission: '')
@@ -23,15 +31,55 @@ class Post < ApplicationRecord
   private
 
   def notify_followers
-    # Skip if notifications table doesn't exist (e.g., during seeds on a fresh DB)
-    return unless ActiveRecord::Base.connection.data_source_exists?('notifications')
+    return unless cliq && user_id.present?
 
-    # user.followers.find_each do |follower|
-    #   Notification.create!(
-    #     user: follower,
-    #     notifiable: self,
-    #     message: "#{user.profile.username} posted a new update"
-    #   )
-    # end
+    cliq_ids = [cliq.id]
+    cliq_ids.concat(cliq.ancestors.map(&:id)) if cliq.respond_to?(:ancestors)
+    cliq_ids.compact!
+
+    subscriber_ids = Subscription.where(cliq_id: cliq_ids, enabled: true)
+                                  .where.not(user_id: user_id)
+                                  .distinct
+                                  .pluck(:user_id)
+    return if subscriber_ids.empty?
+
+    actor_name = user.profile&.username || user.email || "Someone"
+    message = "#{actor_name} posted in #{cliq.name}: #{title}"
+    timestamp = Time.current
+
+    Notification.insert_all(
+      subscriber_ids.map do |recipient_id|
+        {
+          user_id:         recipient_id,
+          actor_id:        user_id,
+          notifiable_type: "Post",
+          notifiable_id:   id,
+          message:         message,
+          created_at:      timestamp,
+          updated_at:      timestamp
+        }
+      end
+    )
+  end
+
+  def notify_followers_of_article
+    return unless article? && user_id.present?
+
+    follower_ids = FollowedUser.where(followed_id: user_id).pluck(:follower_id)
+    return if follower_ids.empty?
+
+    Notification.insert_all(
+      follower_ids.map do |recipient_id|
+        {
+          user_id:         recipient_id,
+          actor_id:        user_id,
+          notifiable_type: "Post",
+          notifiable_id:   id,
+          message:         "New article by #{user.profile&.username || user.email || "a user"}: #{title}",
+          created_at:      Time.current,
+          updated_at:      Time.current
+        }
+      end
+    )
   end
 end

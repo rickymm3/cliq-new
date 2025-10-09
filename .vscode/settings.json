@@ -1,0 +1,10 @@
+{
+  "ruby.useBundler": true,
+  "ruby.bundlerPath": "${workspaceFolder}/bin/bundle",
+  "ruby.testExplorer.rails": true,
+  "ruby.testExplorer.minitestCommand": "${workspaceFolder}/bin/rails test",
+  "ruby.testExplorer.runInTerminal": true,
+  "ruby.rubyPath": "/Users/richardmason/.rbenv/shims/ruby",
+  "editor.tabSize": 2,
+  "diffEditor.ignoreTrimWhitespace": false
+}

@@ -4,7 +4,10 @@ class FollowedUsersController < ApplicationController
 
   # List all users that current_user follows
   def index
-    @followed_users = current_user.followed_users
+    @profile = current_user.profile
+    @owner_viewing = true
+    @section = :following
+    @followed_users = current_user.followed_users.includes(:profile)
   end
 
   # Follow a user (called from a profile or carrot button)

@@ -1,13 +1,15 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+discussion_post:
+  title: Fixture Discussion Post
+  legacy_content: Fixture discussion content
+  cliq: child_cliq
+  user: alice
+  slug: fixture-discussion-post
+  post_type: 0
 
-one:
-  title: MyString
-  content: MyText
-  cliq_id: 1
-  user_id: 1
-
-two:
-  title: MyString
-  content: MyText
-  cliq_id: 1
-  user_id: 1
+article_post:
+  title: Fixture Article Post
+  legacy_content: Fixture article content
+  cliq: child_cliq
+  user: bob
+  slug: fixture-article-post
+  post_type: 1

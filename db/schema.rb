@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_09_23_190513) do
+ActiveRecord::Schema[7.1].define(version: 2025_10_08_184013) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -74,6 +74,21 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_23_190513) do
     t.index ["follower_id"], name: "index_followed_users_on_follower_id"
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "actor_id", null: false
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.string "message", null: false
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_notifications_on_actor_id"
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
   create_table "posts", force: :cascade do |t|
     t.string "title"
     t.text "legacy_content"
@@ -84,6 +99,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_23_190513) do
     t.string "slug"
     t.integer "replies_count", default: 0, null: false
     t.boolean "deleted", default: false, null: false
+    t.integer "post_type", default: 0, null: false
+    t.index ["post_type"], name: "index_posts_on_post_type"
     t.index ["slug"], name: "index_posts_on_slug", unique: true
   end
 
@@ -135,6 +152,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_23_190513) do
   add_foreign_key "cliqs", "cliqs", column: "parent_cliq_id"
   add_foreign_key "followed_users", "users", column: "followed_id"
   add_foreign_key "followed_users", "users", column: "follower_id"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "notifications", "users", column: "actor_id"
   add_foreign_key "profiles", "users"
   add_foreign_key "replies", "posts"
   add_foreign_key "replies", "replies", column: "parent_reply_id"

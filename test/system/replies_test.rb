@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class RepliesTest < ApplicationSystemTestCase
   setup do
-    @reply = replies(:one)
+    @reply = replies(:discussion_reply)
   end
 
   test "visiting the index" do

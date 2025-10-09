@@ -125,8 +125,9 @@ class CliqsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_cliq
-      if params[:id]
-        @cliq = Cliq.friendly.find(params[:id])
+      identifier = params[:cliq_id].presence || params[:id]
+      if identifier.present?
+        @cliq = Cliq.friendly.find(identifier)
       else
         @cliq = Cliq.find_by(parent_cliq_id: nil)
       end

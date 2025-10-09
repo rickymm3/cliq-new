@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class CliqsTest < ApplicationSystemTestCase
   setup do
-    @cliq = cliqs(:one)
+    @cliq = cliqs(:child_cliq)
   end
 
   test "visiting the index" do

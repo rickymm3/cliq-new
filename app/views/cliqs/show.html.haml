@@ -1,12 +1,18 @@
 = turbo_frame_tag "main_content" do
-  .container
-    .row.g-4
-      / LEFT sidebar
-      .col-lg-3.d-none.d-lg-block.sidebar-left
+  .cliq-layout{ data: { controller: "sidebar-layout" } }
+    %button.cliq-layout__toggle.cliq-layout__toggle--left.btn.btn-light.btn-sm{ type: "button", data: { action: "sidebar-layout#toggleLeft", sidebar_layout_target: "leftToggle" }, aria: { label: "Toggle left sidebar" } }
+      %i.bi
+    %button.cliq-layout__toggle.cliq-layout__toggle--right.btn.btn-light.btn-sm{ type: "button", data: { action: "sidebar-layout#toggleRight", sidebar_layout_target: "rightToggle" }, aria: { label: "Toggle right sidebar" } }
+
+    .cliq-layout__side.cliq-layout__side--left{ data: { sidebar_layout_target: "leftSide" } }
+      .cliq-layout__sidebar
         = render "cliqs/sidebar", cliq: @cliq
 
-      / CENTER: posts
-      .col-lg-6
+    .cliq-layout__content{ data: { sidebar_layout_target: "content" } }
+      .cliq-layout__content-inner
+        .cliq-layout__content-top.d-xl-none
+          = render "cliqs/sidebar_cliq_info", cliq: @cliq
+
         .space-y-4
           - if @posts.any?
             = render "posts"
@@ -15,6 +21,10 @@
               No posts yet. Be the first to share something!
           = render "pager", pagy: @pagy, cliq: @cliq
 
-      / RIGHT sidebar: cliq info
-      .col-lg-3.d-none.d-lg-block.sidebar-right
+    .cliq-layout__side.cliq-layout__side--right.d-none.d-xl-block{ data: { sidebar_layout_target: "rightSide" } }
+      .cliq-layout__sidebar
         = render "cliqs/sidebar_cliq_info", cliq: @cliq
+
+    %button.cliq-layout__mobile-toggle.btn.btn-primary.btn-sm.d-none{ type: "button", data: { action: "sidebar-layout#toggleMobile", sidebar_layout_target: "mobileToggle" }, aria: { label: "Toggle side panels" } }
+      %i.bi.bi-layout-sidebar-inset
+      %span.ms-2 Panels

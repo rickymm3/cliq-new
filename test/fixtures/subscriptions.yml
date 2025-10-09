@@ -1,9 +1,7 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+alice_root:
+  user: alice
+  cliq: root_cliq
 
-one:
-  user: one
-  cliq: one
-
-two:
-  user: two
-  cliq: two
+bob_child:
+  user: bob
+  cliq: child_cliq

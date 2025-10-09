@@ -1,121 +1,106 @@
-/* app/assets/stylesheets/posts.scss */
+/* app/assets/stylesheets/components/_posts.scss */
 
 .post-card {
-  // display: flex;
-  align-items: flex-start;
-  border: 1px solid #e1e1e1;
-  border-radius: 4px;
-  // padding: 1rem;
-  margin-bottom: 1rem;
-  background-color: #fff;
-}
+  border-radius: 1rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 
-.post-avatar {
-  margin-right: 1rem;
-
-  .avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-}
-
-.post-cliq-location {
-  font-size: 0.9rem;
-  border-bottom: 1px solid #e5e7eb; /* neutral divider */
-
-  %small {
-    color: #666;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 1rem 2rem -1.25rem rgba(15, 23, 42, 0.4);
   }
 
-  .cliq-history {
-    display: inline-block;
-    margin-right: 0.25rem;
+  &.post-card--highlight,
+  &.new-replies {
+    border-color: var(--bs-primary-border-subtle, rgba(59, 130, 246, 0.4));
+    box-shadow: 0 1rem 2.5rem -1.25rem rgba(59, 130, 246, 0.55);
+  }
 
-    .cliq-name {
-      color: #007bff; // or your link color
-      text-decoration: none;
-      &:hover {
-        text-decoration: underline;
-      }
+  .avatar-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--bs-primary-bg-subtle, #eef2ff);
+    color: var(--bs-primary, #1d4ed8);
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &--md {
+      width: 44px;
+      height: 44px;
+      font-size: 1rem;
     }
   }
-}
 
-.post-content {
-  flex: 1; /* Let the content expand as needed */
-  // border: 1px solid #000000;
-  border-radius: 4px;
-  padding: 0rem 1rem 1rem 1rem;
-  margin-bottom: 5px;
+  .post-badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
 
-  .post-header {
-    margin-bottom: 0.5rem;
-
-    .post-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-right: 0.5rem;
-
-      a {
-        text-decoration: none;
-        color: #333;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-
-    .post-meta {
-      display: inline-block;
-      margin-left: 0.5rem;
-      color: #777;
-
-      .post-author {
-        margin-right: 1rem;
-        font-weight: 500;
-        color: #555;
-      }
-
-      .post-date {
-        font-size: 0.85rem;
-        color: #999;
-      }
+  .post-meta {
+    span {
+      margin-right: 0.4rem;
     }
   }
 
   .post-body {
-    margin-bottom: 0.75rem;
-    color: #444;
-    line-height: 1.4;
+    color: #1f2933;
+    line-height: 1.65;
+
+    &.rich-text {
+      p,
+      ul,
+      ol {
+        margin-bottom: 0.9rem;
+      }
+
+      ul {
+        padding-left: 1.2rem;
+      }
+
+      ol {
+        padding-left: 1.35rem;
+      }
+
+      h2,
+      h3,
+      h4 {
+        margin-top: 1.6rem;
+        margin-bottom: 0.85rem;
+        font-weight: 600;
+      }
+    }
+
+    &--preview {
+      max-height: 9rem;
+      overflow: hidden;
+      position: relative;
+      mask-image: linear-gradient(180deg, #000 70%, transparent);
+      -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent);
+    }
   }
 
-  .post-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .post-stats {
+    font-size: 0.85rem;
 
-    .post-actions {
-
-      .post-edit {
-        background-color: red!important;
-        margin: 10px;
-      }
-      /* Add spacing for any action buttons/links */
-      a {
-        margin-right: 0.5rem;
-      }
+    i {
+      font-size: 1rem;
+      line-height: 1;
     }
+  }
 
-    .reply-count {
-      font-size: 0.9rem;
-      color: #555;
+  .dropdown .btn {
+    border-color: rgba(148, 163, 184, 0.6);
+  }
+}
 
-      i.fa {
-        margin-right: 4px;
-      }
-    }
+.rich-text {
+  a {
+    color: var(--bs-primary, #1d4ed8);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
   }
 }

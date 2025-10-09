@@ -45,7 +45,10 @@ class PostsController < ApplicationController
   # GET /posts/new
   def new
     @cliq = Cliq.find_by(id: params[:cliq_id]) if params[:cliq_id].present?
-    @post = @post || Post.new  # if coming from a failed render, @post is already set
+    @post = Post.new(post_type: (params[:post_type].presence || :discussion))
+  
+    # Important: always render the full template so the response contains the frame
+    render :new
   end
 
   # GET /posts/1/edit
@@ -72,7 +75,8 @@ class PostsController < ApplicationController
   def create
     @post = Post.new(post_params.except(:new_cliq_name, :new_cliq_parent_id))
     @post.user = current_user
-  
+    @post.post_type ||= :discussion
+
     new_name = post_params[:new_cliq_name].to_s.strip
     parent   = post_params[:new_cliq_parent_id].present? ? Cliq.find_by(id: post_params[:new_cliq_parent_id]) : nil
   
@@ -190,8 +194,9 @@ class PostsController < ApplicationController
     def post_params
       params.require(:post).permit(
         :title, :content, :cliq_id,
-        :new_cliq_name, :new_cliq_parent_id
+        :new_cliq_name, :new_cliq_parent_id,
+        :post_type  # ← allow user to choose type
       )
     end
-
+    
 end

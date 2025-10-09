@@ -1,7 +1,1 @@
-= turbo_stream.append "posts" do
-  = render partial: "posts/post", collection: @posts, as: :post
-
-= turbo_stream.replace "pager" do
-  = render "cliqs/pager",
-           pagy: @pagy,
-           url: profile_path(@profile, filter: params[:filter], sort: params[:sort], page: @pagy.next)
+= render 'profiles/posts_stream'

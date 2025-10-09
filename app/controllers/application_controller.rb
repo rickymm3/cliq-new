@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  helper Pagy::Frontend
   before_action :set_page_cliq
   before_action :set_root_cliq
   before_action :initialize_cliqs
@@ -30,14 +31,14 @@ class ApplicationController < ActionController::Base
     store_location_for(:user, request.fullpath)
   end
 
-  # On successful sign in, go back to where the user was.
-  def after_sign_in_path_for(resource)
-    stored_location_for(resource) || request.referer || root_path
+  # Ensure post-auth flows always land on the homepage.
+  def after_sign_in_path_for(_resource)
+    root_path
   end
 
-  # On sign out, go back to where they came from (or home)
-  def after_sign_out_path_for(resource_or_scope)
-    request.referer || root_path
+  # Redirect to the homepage after sign out as well.
+  def after_sign_out_path_for(_resource_or_scope)
+    root_path
   end
 
   def user_not_authorized

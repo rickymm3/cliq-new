@@ -43,7 +43,14 @@ Rails.application.routes.draw do
 
   # Resourceful routes for profiles.
   # With the Profile model’s to_param override, profile_path(@profile) will use the username.
-  resources :profiles, only: [:show, :edit, :update]
+  resources :profiles, only: [:show, :edit, :update] do
+    member do
+      get :posts
+      get :replies
+      get :articles
+      get :subscriptions
+    end
+  end
 
   # Routes for following users using the FollowedUser model.
   post 'follow/:user_id', to: 'followed_users#create', as: :follow_user
@@ -51,5 +58,9 @@ Rails.application.routes.draw do
   resources :followed_users, only: [:index]
 
   # Notifications routes.
-  resources :notifications, only: [:index, :update]
+  resources :notifications, only: [:index, :update] do
+    collection do
+      patch :mark_all_read
+    end
+  end
 end

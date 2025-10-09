@@ -1,28 +1,91 @@
 -# app/views/posts/_post.html.haml
 - show_new_badge = local_assigns.key?(:show_new_badge) ? show_new_badge : false
-- post_card_classes = show_new_badge ? "post-card new-replies" : "post-card"
+- full_view      = local_assigns.fetch(:full_view, false)
+- card_classes   = ["post-card", "card", "shadow-sm", "border-0", "mb-4"]
+- if show_new_badge
+  - card_classes << "post-card--highlight"
+  - card_classes << "new-replies"
+- title_path = post_id_slug_post_path(post_id: post.id, slug: post.slug)
+- owner_viewing = defined?(current_user) && current_user.present? && current_user == post.user
+- display_name = post.user&.profile&.username || post.user&.email || "User"
+- avatar_initial = display_name.to_s.first&.upcase || "U"
+- post_type_label = post.respond_to?(:post_type) && post.post_type.present? ? post.post_type.titleize : nil
 
 = turbo_frame_tag dom_id(post) do
-  %div{ class: post_card_classes }
-    .post
-      .post-actions
-        .post-cliq-location
-          = render "posts/post_info/path_header", post: post
-      .post-content
-        .post-header
-          .post-title
-            = link_to post.title,
-              post_id_slug_post_path(post_id: post.id, slug: post.slug),
-              data: { turbo_frame: "_top", turbo_action: "advance" }
-        .post-body
-          - if post.deleted?
-            .alert.alert-warning.mb-0= t("posts.deleted_message")
-          - else
-            = post.content
-        .post-footer
-          .post-author
-            = 'by'
-            = render partial: "posts/post_info/author", locals: { post: post }
-          .reply-count
-            %i.fa.fa-reply
-            = post.replies_count
+  %div{ class: card_classes.join(" ") }
+    .card-body.p-4
+      .d-flex.align-items-start.justify-content-between.gap-3.flex-wrap
+        .d-flex.align-items-center.gap-3.flex-wrap
+          .avatar-circle.avatar-circle--md{ title: display_name }
+            = avatar_initial
+          .min-w-0
+            .text-muted.small.mb-2
+              = render "posts/post_info/path_header", post: post
+            %h2.h5.mb-1.text-break
+              = link_to post.title,
+                        title_path,
+                        class: "text-decoration-none text-dark",
+                        data: { turbo_frame: "_top", turbo_action: "advance" }
+            .text-muted.small.post-meta
+              = render partial: "posts/post_info/author", locals: { post: post }
+        - if post_type_label
+          %span.badge.text-bg-light.post-badge= post_type_label
+
+    - if post.deleted?
+      .card-body.border-top
+        .alert.alert-warning.mb-0= t("posts.deleted_message")
+    - else
+      .card-body.border-top
+        - body_classes = ["post-body", "rich-text"]
+        - body_classes << "post-body--preview" unless full_view
+        %div{ class: body_classes.join(" ") }
+          = post.content
+
+    - if full_view
+      .card-footer.bg-transparent.border-0.pt-0
+        .d-flex.align-items-center.justify-content-between.flex-wrap.gap-3
+          = link_to "Reply",
+                    new_post_reply_path(post),
+                    class: "btn btn-primary btn-sm",
+                    data: { turbo_frame: "new_reply" }
+
+          .d-flex.align-items-center.gap-3.flex-wrap
+            .post-stats.d-flex.align-items-center.gap-3.text-muted.small
+              .d-flex.align-items-center.gap-2
+                %i.bi.bi-chat-left-text
+                = pluralize(post.replies_count, "reply")
+              .d-flex.align-items-center.gap-2
+                %i.bi.bi-clock-history
+                = "#{time_ago_in_words(post.updated_at)} ago"
+
+            - if owner_viewing
+              .dropdown
+                %button.btn.btn-outline-secondary.btn-sm{ data: { bs_toggle: "dropdown" }, aria: { expanded: "false" } }
+                  %i.bi.bi-three-dots-vertical
+                %ul.dropdown-menu.dropdown-menu-end
+                  %li
+                    = link_to "Edit",
+                              edit_post_path(post.id),
+                              class: "dropdown-item",
+                              data: { turbo_frame: "_top", turbo_action: "advance" }
+                  %li
+                    = button_to "Delete",
+                                soft_delete_post_path(post.id),
+                                method: :patch,
+                                class: "dropdown-item text-danger",
+                                form: { data: { turbo_confirm: "Delete this post?", turbo_frame: "_top", turbo_action: "advance" } }
+    - else
+      .card-footer.bg-transparent.border-0.pt-0
+        .d-flex.align-items-center.justify-content-between.flex-wrap.gap-3
+          = link_to "Read post",
+                    title_path,
+                    class: "btn btn-outline-primary btn-sm",
+                    data: { turbo_frame: "_top", turbo_action: "advance" }
+
+          .post-stats.d-flex.align-items-center.gap-3.text-muted.small
+            .d-flex.align-items-center.gap-2
+              %i.bi.bi-chat-left-text
+              = pluralize(post.replies_count, "reply")
+            .d-flex.align-items-center.gap-2
+              %i.bi.bi-clock-history
+              = "#{time_ago_in_words(post.updated_at)} ago"

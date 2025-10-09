@@ -18,5 +18,8 @@ module CliqNew
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Make all helpers (including ApplicationHelper) available in every controller/view.
+    config.action_controller.include_all_helpers = true
   end
 end

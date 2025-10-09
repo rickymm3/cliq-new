@@ -20,6 +20,10 @@ class User < ApplicationRecord
   has_many :subscriptions, dependent: :destroy
   has_many :subscribed_cliqs, through: :subscriptions, source: :cliq
 
+  #notifications:
+  has_many :notifications, dependent: :destroy          # as recipient
+  has_many :sent_notifications, class_name: "Notification", foreign_key: :actor_id, dependent: :nullify
+
   # ---------- Subscriptions helpers (query Subscription directly to avoid recursion) ----------
 
   # Returns the Subscription (if any) for the given cliq

@@ -1,4 +1,23 @@
-# one:
-#   record: name_of_fixture (ClassOfFixture)
-#   name: content
-#   body: <p>In a <i>million</i> stars!</p>
+discussion_post_content:
+  record_type: Post
+  record_id: <%= ActiveRecord::FixtureSet.identify(:discussion_post) %>
+  name: content
+  body: <div>Fixture discussion content</div>
+
+article_post_content:
+  record_type: Post
+  record_id: <%= ActiveRecord::FixtureSet.identify(:article_post) %>
+  name: content
+  body: <div>Fixture article content</div>
+
+discussion_reply_content:
+  record_type: Reply
+  record_id: <%= ActiveRecord::FixtureSet.identify(:discussion_reply) %>
+  name: content
+  body: <div>Fixture reply content</div>
+
+child_reply_content:
+  record_type: Reply
+  record_id: <%= ActiveRecord::FixtureSet.identify(:child_reply) %>
+  name: content
+  body: <div>Fixture child reply content</div>
