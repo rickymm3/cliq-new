@@ -13,7 +13,8 @@
                 new_post_path(cliq_id: @cliq.id),
                 class: "btn btn-primary btn-sm",
                 data: { turbo_frame: "_top", turbo_action: "advance" }
-      = link_to "New Sub-Cliq",
-                new_cliq_path(parent_cliq_id: @cliq.id),
-                class: "btn btn-dark btn-sm",
-                data: { turbo_frame: "_top", turbo_action: "advance" }
+      - if @cliq.can_add_child?
+        = link_to "New Sub-Cliq",
+                  new_cliq_path(parent_cliq_id: @cliq.id),
+                  class: "btn btn-dark btn-sm",
+                  data: { turbo_frame: "_top", turbo_action: "advance" }

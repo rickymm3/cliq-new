@@ -5,5 +5,4 @@
     %span.fw-semibold= profile.username
 
   - if user_signed_in? && !owner
-    = turbo_frame_tag "follow_button" do
-      = render partial: "followed_users/follow_button", locals: { user: profile.user }
+    = render partial: "followed_users/follow_button", locals: { user: profile.user }

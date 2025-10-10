@@ -21,7 +21,7 @@ class Post < ApplicationRecord
   after_commit :notify_followers_of_article, on: :create
 
   def title_truncated
-    title.truncate(20, omission: '')
+    title.to_s.truncate(20, omission: '')
   end
 
   def should_generate_new_friendly_id?

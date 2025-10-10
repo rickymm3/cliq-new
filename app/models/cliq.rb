@@ -2,7 +2,11 @@ class Cliq < ApplicationRecord
   extend FriendlyId
   friendly_id :slug_candidates, use: :slugged
 
+  MAX_CHILD_CLIQS = 7
+  MAX_TREE_LEVELS = 7 # total levels counting root as level 1
+
   validates :name, presence: true, uniqueness: { scope: :parent_cliq_id, message: "must be unique under the same parent" }
+  validate :parent_child_limit
 
   has_many :posts
   belongs_to :parent_cliq, class_name: 'Cliq', foreign_key: 'parent_cliq_id', optional: true
@@ -66,5 +70,32 @@ class Cliq < ApplicationRecord
   # subscriptions
   def root_or_self
     ancestors.any? ? ancestors.first : self
+  end
+
+  def depth_from_root
+    ancestors.length
+  end
+
+  def level_from_root
+    depth_from_root + 1
+  end
+
+  def can_add_child?
+    child_cliqs.count < MAX_CHILD_CLIQS && level_from_root < MAX_TREE_LEVELS
+  end
+
+  private
+
+  def parent_child_limit
+    return unless parent_cliq.present?
+
+    existing_children = self.class.where(parent_cliq_id: parent_cliq_id).where.not(id: id).count
+    if existing_children >= MAX_CHILD_CLIQS
+      errors.add(:base, "This cliq already has the maximum number of child cliqs (#{MAX_CHILD_CLIQS}).")
+    end
+
+    if parent_cliq.level_from_root >= MAX_TREE_LEVELS
+      errors.add(:base, "This cliq is already at the deepest level allowed.")
+    end
   end
 end

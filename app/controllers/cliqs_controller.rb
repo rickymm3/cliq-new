@@ -35,9 +35,29 @@ class CliqsController < ApplicationController
   
   # GET /cliqs/new
   def new
-    # Parent cliq context (optional)
     @parent_cliq = Cliq.find_by(id: params[:parent_cliq_id])
-    @post = Post.new
+    if @parent_cliq && !@parent_cliq.can_add_child?
+      message = if @parent_cliq.child_cliqs.count >= Cliq::MAX_CHILD_CLIQS
+                  "This cliq already has the maximum number of child cliqs (#{Cliq::MAX_CHILD_CLIQS})."
+                else
+                  "This cliq is already at the deepest level allowed."
+                end
+
+      respond_to do |format|
+        format.html { redirect_to cliq_path(@parent_cliq), alert: message }
+        format.turbo_stream do
+          flash.now[:alert] = message
+          render turbo_stream: [
+            turbo_stream.replace("flash", partial: "layouts/flash"),
+            turbo_stream.replace("turbo-visit-placeholder", partial: "shared/turbo_visit", locals: { path: cliq_path(@parent_cliq) })
+          ], status: :see_other
+        end
+      end
+      return
+    end
+
+    @cliq = Cliq.new(parent_cliq: @parent_cliq)
+    @cliq.posts.build
   end
 
   def search
@@ -67,14 +87,31 @@ class CliqsController < ApplicationController
   def create
     @cliq = Cliq.new(cliq_params)
     @parent_cliq = @cliq.parent_cliq
+    @cliq.posts.each { |post| post.user ||= current_user }
+    @cliq.posts.build(user: current_user) if @cliq.posts.empty?
   
     if @cliq.save
+      initial_post = @cliq.posts.order(:created_at).first
+      redirect_path = if initial_post&.slug.present?
+                        post_id_slug_post_path(post_id: initial_post.id, slug: initial_post.slug)
+                      else
+                        cliq_path(@cliq)
+                      end
+
+      flash[:notice] = "Cliq created."
       respond_to do |format|
-        format.html        { redirect_to cliq_path(@cliq), notice: "Cliq created." }
-        format.turbo_stream { redirect_to cliq_path(@cliq), status: :see_other }
+        format.html        { redirect_to redirect_path }
+        format.turbo_stream do
+          flash.now[:notice] = "Cliq created."
+          render turbo_stream: [
+            turbo_stream.replace("flash", partial: "layouts/flash"),
+            turbo_stream.replace("turbo-visit-placeholder", partial: "shared/turbo_visit", locals: { path: redirect_path })
+          ]
+        end
         format.json        { render :show, status: :created, location: @cliq }
       end
     else
+      flash.now[:alert] = @cliq.errors.full_messages.to_sentence
       respond_to do |format|
         format.html         { render :new, status: :unprocessable_entity }
         format.turbo_stream { render :new, status: :unprocessable_entity }
@@ -135,6 +172,7 @@ class CliqsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def cliq_params
-      params.require(:cliq).permit(:name, :slug, :description, :parent_cliq_id, :cliq) # Replace :attribute1, etc., with actual attribute names of Cliq model
+      params.require(:cliq).permit(:name, :slug, :description, :parent_cliq_id,
+                                   posts_attributes: [:title, :content])
     end
 end
