@@ -15,6 +15,13 @@ class Cliq < ApplicationRecord
   has_many :subscriptions, dependent: :destroy
   has_many :subscribers, through: :subscriptions, source: :user
 
+  has_many :candidate_supports, dependent: :destroy
+  has_many :moderator_roles, dependent: :destroy
+  has_many :reports, dependent: :destroy
+  has_many :moderation_delegations, dependent: :destroy
+
+  enum rank: { unranked: 0, bronze: 1, silver: 2, gold: 3 }, _prefix: true
+
   alias_attribute :parent, :parent_cliq
   accepts_nested_attributes_for :posts
 
@@ -82,6 +89,32 @@ class Cliq < ApplicationRecord
 
   def can_add_child?
     child_cliqs.count < MAX_CHILD_CLIQS && level_from_root < MAX_TREE_LEVELS
+  end
+
+  def rank_name
+    rank&.to_s || "unranked"
+  end
+
+  def seats_for_rank
+    Moderation.config.seats_for(rank_name)
+  end
+
+  def support_capacity_per_user
+    Moderation.config.support_capacity_for(rank_name)
+  end
+
+  def sla_hours
+    Moderation.config.sla_hours_for(rank_name)
+  end
+
+  def pending_reports
+    reports.where(state: :pending)
+  end
+
+  def active_moderators
+    moderator_roles.where(status: "active")
+                   .where(ended_at: nil)
+                   .order(started_at: :asc)
   end
 
   private

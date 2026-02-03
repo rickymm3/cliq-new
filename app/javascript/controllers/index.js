@@ -18,3 +18,6 @@ application.register("search", SearchController)
 
 import SidebarLayoutController from "./sidebar_layout_controller"
 application.register("sidebar-layout", SidebarLayoutController)
+
+import ImageLightboxController from "./image_lightbox_controller"
+application.register("image-lightbox", ImageLightboxController)

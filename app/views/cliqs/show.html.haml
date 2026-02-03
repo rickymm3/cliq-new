@@ -1,8 +1,11 @@
 = turbo_frame_tag "main_content" do
+  = render "cliqs/breadcrumb_bar", cliq: @cliq
   .cliq-layout{ data: { controller: "sidebar-layout" } }
     %button.cliq-layout__toggle.cliq-layout__toggle--left.btn.btn-light.btn-sm{ type: "button", data: { action: "sidebar-layout#toggleLeft", sidebar_layout_target: "leftToggle" }, aria: { label: "Toggle left sidebar" } }
       %i.bi
     %button.cliq-layout__toggle.cliq-layout__toggle--right.btn.btn-light.btn-sm{ type: "button", data: { action: "sidebar-layout#toggleRight", sidebar_layout_target: "rightToggle" }, aria: { label: "Toggle right sidebar" } }
+
+    .cliq-layout__overlay{ data: { sidebar_layout_target: "overlay", action: "click->sidebar-layout#closeOverlays" } }
 
     .cliq-layout__side.cliq-layout__side--left{ data: { sidebar_layout_target: "leftSide" } }
       .cliq-layout__sidebar

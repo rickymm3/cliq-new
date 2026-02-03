@@ -62,7 +62,7 @@ class ProfilesController < ApplicationController
     @section = :overview
     @sort    = normalized_sort(default: 'recent_activity', allowed: %w[recent_activity created])
 
-    base = Post.where(user_id: @user.id)
+    base = Post.visible_in_feeds.where(user_id: @user.id)
                .left_joins(:replies)
                .group('posts.id')
                .includes(user: :profile, cliq: :parent_cliq)
@@ -82,7 +82,7 @@ class ProfilesController < ApplicationController
     @section = :posts
     @sort    = normalized_sort(default: 'created', allowed: %w[recent_activity created])
 
-    base = @user.posts.includes(user: :profile, cliq: :parent_cliq).order(created_at: :desc)
+    base = @user.posts.visible_in_feeds.includes(user: :profile, cliq: :parent_cliq).order(created_at: :desc)
     # The posts list only needs created-desc ordering, but we keep the sort param for consistency.
     @pagy, @posts = pagy(base)
     @next_page_url = @pagy.next ? posts_profile_path(@profile, sort: @sort, page: @pagy.next) : nil
@@ -94,6 +94,7 @@ class ProfilesController < ApplicationController
 
     base = @user.posts
                 .where(post_type: Post.post_types[:article])
+                .visible_in_feeds
                 .includes(user: :profile, cliq: :parent_cliq)
                 .order(created_at: :desc)
 

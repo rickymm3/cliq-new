@@ -14,6 +14,8 @@ class Reply < ApplicationRecord
 
   scope :top_level, -> { where(parent_reply_id: nil) }
 
+  after_create :bump_post_heat
+
   def can_accept_child_reply?
     parent_reply_id.nil?
   end
@@ -25,5 +27,9 @@ class Reply < ApplicationRecord
     if parent_reply&.parent_reply_id.present?
       errors.add(:parent_reply_id, "can only reply to a top-level reply")
     end
+  end
+
+  def bump_post_heat
+    post&.bump_heat!(:reply)
   end
 end

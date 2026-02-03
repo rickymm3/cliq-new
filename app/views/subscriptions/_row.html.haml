@@ -9,4 +9,5 @@
 
     = link_to "−",
       confirm_subscription_path(subscription),
-      class: "text-sm text-red-600"
+      class: "btn btn-xxs btn-outline-danger",
+      data: { turbo_frame: dom_id(subscription) }

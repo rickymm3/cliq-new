@@ -1,5 +1,8 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  # Ignore Chrome devtools well-known probe to keep logs clean
+  get '/.well-known/appspecific/com.chrome.devtools.json', to: proc { [204, {}, []] }
+
   resources :replies
 
   get 'home/index'
@@ -15,6 +18,7 @@ Rails.application.routes.draw do
       get 'edit', to: 'posts#edit'
       patch :soft_delete 
     end
+    resource :candidate_support, only: [:create, :destroy], module: :posts
     resources :replies, only: [:create, :destroy, :new]
     get ':slug', action: 'show', as: :id_slug_post
   end
@@ -41,6 +45,14 @@ Rails.application.routes.draw do
     resources :cliqs, only: [:show, :new, :create], controller: 'cliqs', path: ''
   end
 
+  resources :reports, only: [:create, :update]
+
+  namespace :moderation do
+    resources :queues, only: [:show]
+    resources :actions, only: [:create]
+    resources :transparency, only: [:show]
+  end
+
   # Resourceful routes for profiles.
   # With the Profile model’s to_param override, profile_path(@profile) will use the username.
   resources :profiles, only: [:show, :edit, :update] do
@@ -63,4 +75,14 @@ Rails.application.routes.draw do
       patch :mark_all_read
     end
   end
+
+  resources :direct_messages, only: [:index, :show, :create] do
+    collection do
+      get :search
+    end
+
+    resources :messages, only: :create, module: :direct_messages
+  end
+
+  get "popular", to: "posts#popular", as: :popular_posts
 end

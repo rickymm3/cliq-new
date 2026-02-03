@@ -6,13 +6,55 @@ default:
     science: "#10b981"         # emerald-500
     gaming: "#3b82f6"          # blue-500
     politics: "#f59e0b"        # amber-500
+  moderation:
+    eligibility:
+      minimum_account_age_days: 30
+      minimum_activity_score: 100
+      maximum_active_strikes: 0
+    rate_limits:
+      moderation_post_window_days: 30
+      moderation_post_limit: 1
+      support_action_window_hours: 24
+      support_action_limit: 25
+      report_window_hours: 12
+      report_limit: 10
+    ranks:
+      unranked:
+        seats: 0
+        support_capacity: 0
+        sla_hours: 24
+        min_rank_points: 0
+      bronze:
+        seats: 2
+        support_capacity: 1
+        sla_hours: 12
+        min_rank_points: 100
+      silver:
+        seats: 4
+        support_capacity: 2
+        sla_hours: 6
+        min_rank_points: 250
+      gold:
+        seats: 6
+        support_capacity: 3
+        sla_hours: 2
+        min_rank_points: 500
+    liquid_democracy:
+      enabled: false
+      delegate_max_depth: 1
+    transparency:
+      actions_window_days: 30
+      include_counts: true
 
 development:
   # override here if you want different colors in dev
   colors: {}
+  moderation: {}
 
 test:
   colors: {}
+  moderation: {}
 
 production:
   colors: {}
+  moderation: {}

@@ -8,11 +8,11 @@
     = button_to (enabled ? "Disable" : "Enable"),
       toggle_subscription_path(subscription),
       method: :patch,
-      form: { data: { turbo_stream: true } },
+      form: { data: { turbo_frame: dom_id(subscription, :pill) } },
       class: "btn btn-xxs btn-outline-secondary"
     = button_to "✕",
       subscription_path(subscription, context: "profile_row"),
       method: :delete,
-      form: { data: { turbo_stream: true } },
+      form: { data: { turbo_frame: dom_id(subscription, :pill) } },
       class: "btn btn-xxs btn-outline-danger subscription-pill__close",
       title: "Unsubscribe"

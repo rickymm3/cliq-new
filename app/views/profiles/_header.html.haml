@@ -5,4 +5,9 @@
     %span.fw-semibold= profile.username
 
   - if user_signed_in? && !owner
-    = render partial: "followed_users/follow_button", locals: { user: profile.user }
+    .d-flex.flex-wrap.gap-2
+      = render partial: "followed_users/follow_button", locals: { user: profile.user }
+      = link_to "Message",
+                direct_messages_path(user_id: profile.user.id),
+                class: "btn btn-outline-primary btn-sm",
+                data: { turbo_method: :post, turbo_frame: "_top" }

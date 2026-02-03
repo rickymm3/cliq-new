@@ -6,11 +6,15 @@ export default class extends Controller {
 
   connect() {
     this.timeout = null;
-    console.log("SearchController connected");
   }
 
   search() {
     const query = this.inputTarget.value.trim();
+    if (!query.length) {
+      clearTimeout(this.timeout);
+      this.hideDropdown();
+      return;
+    }
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       const form = this.element.querySelector("form");
@@ -44,6 +48,14 @@ export default class extends Controller {
   showDropdown() {
     if (this.hasDropdownTarget) {
       this.dropdownTarget.classList.add("show");
+    }
+  }
+
+  select() {
+    this.hideDropdown();
+    if (this.hasInputTarget) {
+      this.inputTarget.value = "";
+      this.inputTarget.blur();
     }
   }
 }

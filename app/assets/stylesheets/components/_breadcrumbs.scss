@@ -52,3 +52,29 @@
 .breadcrumb-umbrella .dropdown li a:hover,
 .breadcrumb-umbrella .dropdown li a:focus { background: #f8fafc; }
 .breadcrumb-umbrella .dropdown li.current a { font-weight: 600; }
+
+/* Page-wide cliq breadcrumb bar */
+.cliq-breadcrumb-bar {
+  width: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+  padding: 0.45rem 1rem;
+  margin-bottom: 0;
+}
+
+.cliq-breadcrumb-bar__inner {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.cliq-breadcrumb-bar .breadcrumbs {
+  margin: 0;
+}
+
+@media (min-width: 992px) {
+  .cliq-breadcrumb-bar {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}

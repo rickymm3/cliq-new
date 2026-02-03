@@ -6,9 +6,10 @@
       = button_to "Yes",
         subscription_path(subscription, context: "profile_row"),
         method: :delete,
-        form: { data: { turbo_frame: "_top" } },
-        class: "text-sm"
+        form: { data: { turbo_frame: dom_id(subscription) } },
+        class: "btn btn-xxs btn-outline-danger"
 
       = link_to "No",
         row_subscription_path(subscription),
-        class: "text-sm"
+        class: "btn btn-xxs btn-outline-secondary",
+        data: { turbo_frame: dom_id(subscription) }

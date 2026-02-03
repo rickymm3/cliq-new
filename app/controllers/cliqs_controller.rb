@@ -5,7 +5,7 @@ class CliqsController < ApplicationController
   def index
     #change this to a cliq search page
     @cliq = Cliq.find_by(parent_cliq_id: nil)
-    @pagy, @posts = pagy(Post.all.ordered)
+    @pagy, @posts = pagy(Post.visible_in_feeds.ordered)
     respond_to do |format|
       format.html # For regular page load
       format.turbo_stream # For infinite scrolling via Turbo Stream
@@ -16,15 +16,23 @@ class CliqsController < ApplicationController
   def show
     cliq_ids = @cliq.self_and_descendant_ids rescue [@cliq.id]
   
+    @show_moderation_candidates = ActiveModel::Type::Boolean.new.cast(params[:show_moderation_candidates])
+
     base = Post.where(cliq_id: cliq_ids)
                .left_joins(:replies)        # bring in replies for MAX()
                .group('posts.id')           # needed for the aggregate
                .includes(:user, :cliq)
                .reorder(nil)                # IMPORTANT: clear any prior ORDERs (e.g., from scopes)
-  
+
+    base = if @show_moderation_candidates
+             base.moderation_posts
+           else
+             base.visible_in_feeds
+           end
+ 
     # Order by “latest activity” (newest reply OR post creation if no replies)
     order_expr = 'GREATEST(posts.created_at, COALESCE(MAX(replies.created_at), posts.created_at)) DESC'
-  
+ 
     @pagy, @posts = pagy(base.order(Arel.sql(order_expr)))
   
     respond_to do |f|

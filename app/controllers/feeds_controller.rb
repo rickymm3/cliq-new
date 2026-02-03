@@ -13,7 +13,7 @@ class FeedsController < ApplicationController
     end
     expanded_ids.uniq!
 
-    base = Post.where(cliq_id: expanded_ids)
+    base = Post.visible_in_feeds.where(cliq_id: expanded_ids)
                .left_joins(:replies)
                .group('posts.id')
                .includes(:user, :cliq)
@@ -22,6 +22,10 @@ class FeedsController < ApplicationController
     # Same "latest activity" ordering as cliqs#show
     order_expr = 'GREATEST(posts.created_at, COALESCE(MAX(replies.created_at), posts.created_at)) DESC'
     @pagy, @posts = pagy(base.order(Arel.sql(order_expr)))
+    @hot_preview = Post.hot.visible_in_feeds
+                       .includes(:user, :cliq)
+                       .order(heat_score: :desc, updated_at: :desc)
+                       .limit(5)
 
     respond_to do |f|
       f.html

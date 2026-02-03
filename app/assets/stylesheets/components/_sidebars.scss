@@ -1,7 +1,7 @@
 /* Cliq show layout with responsive, sticky sidebars */
 
 .cliq-layout {
-  --sidebar-width: 280px;
+  --sidebar-width: 240px;
   --layout-gap: 1.5rem;
   --layout-top-offset: 72px;
 
@@ -9,7 +9,7 @@
   display: flex;
   align-items: flex-start;
   gap: var(--layout-gap);
-  padding: 1.5rem 1rem 2rem;
+  padding: 0.9rem 1rem 2rem;
   width: 100%;
 }
 
@@ -22,8 +22,8 @@
 
 .cliq-layout__side {
   flex: 0 0 var(--sidebar-width);
-  max-width: var(--sidebar-width);
-  transition: flex-basis 0.25s ease, max-width 0.25s ease, opacity 0.25s ease;
+  min-width: var(--sidebar-width);
+  transition: flex-basis 0.25s ease, min-width 0.25s ease, opacity 0.25s ease;
   overflow: visible;
   position: relative;
 }
@@ -70,6 +70,12 @@
   right: calc(var(--sidebar-width) - 16px);
 }
 
+@media (min-width: 992px) {
+  .cliq-layout__toggle--left {
+    display: none !important;
+  }
+}
+
 .cliq-layout.has-left-collapsed .cliq-layout__toggle--left {
   left: -16px;
 }
@@ -84,6 +90,105 @@
   right: 1.25rem;
   z-index: 40;
   box-shadow: 0 1rem 2.5rem -1.3rem rgba(15, 23, 42, 0.45);
+}
+
+.cliq-layout__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 30;
+}
+
+.cliq-layout__overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebar-nav__item {
+  display: flex;
+}
+
+.sidebar-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  color: #0f172a;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &:focus {
+    background: rgba(15, 23, 42, 0.08);
+    color: #0f172a;
+
+    .sidebar-nav__icon-wrap {
+      background: rgba(15, 23, 42, 0.12);
+    }
+  }
+
+  &.is-active {
+    background: #0f172a;
+    color: #fff;
+    font-weight: 700;
+
+    .sidebar-nav__icon-wrap {
+      background: rgba(255, 255, 255, 0.2);
+      color: inherit;
+    }
+  }
+}
+
+.sidebar-nav__icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-nav__icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.sidebar-nav__label {
+  flex: 1 1 auto;
+  font-size: 1rem;
+}
+
+.sidebar-nav__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #dc3545;
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 700;
 }
 
 /* Overlay behaviour on narrower widths */
@@ -110,14 +215,15 @@
   .cliq-layout__side--left.is-overlay {
     position: fixed;
     top: calc(var(--layout-top-offset) + 8px);
-    left: 1rem;
-    bottom: 1.5rem;
-    width: 90vw;
-    max-width: none;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    min-width: 100vw;
     background: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 1.5rem 3rem -1.5rem rgba(15, 23, 42, 0.65);
-    padding: 1rem;
+    border-radius: 0;
+    box-shadow: 0 -1rem 3rem -1.5rem rgba(15, 23, 42, 0.45);
+    padding: clamp(1rem, 5vw, 1.75rem);
     overflow-y: auto;
     z-index: 35;
     transform: translateX(-120%);
@@ -128,6 +234,8 @@
   .cliq-layout__side--left.is-overlay .cliq-layout__sidebar {
     position: static;
     height: auto;
+    width: min(720px, 100%);
+    margin: 0 auto;
   }
 
   .cliq-layout__side--left.is-overlay:not(.is-collapsed) {
@@ -143,6 +251,10 @@
   .cliq-layout__toggle--left,
   .cliq-layout__toggle--right {
     display: none;
+  }
+
+  .cliq-layout__overlay {
+    display: block;
   }
 }
 

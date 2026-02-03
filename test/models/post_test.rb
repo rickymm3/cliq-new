@@ -2,6 +2,7 @@ require "test_helper"
 require "securerandom"
 
 class PostTest < ActiveSupport::TestCase
+  include ActiveSupport::Testing::TimeHelpers
   setup do
     Notification.delete_all
   end
@@ -77,6 +78,61 @@ class PostTest < ActiveSupport::TestCase
         user: author,
         post_type: :discussion
       )
+    end
+  end
+
+  test "heat score crosses threshold and awards hot window" do
+    author = users(:alice)
+    cliq   = cliqs(:child_cliq)
+
+    travel_to Time.zone.local(2024, 1, 1, 12) do
+      post = Post.create!(
+        title: "Heat threshold #{SecureRandom.hex(3)}",
+        cliq: cliq,
+        user: author,
+        post_type: :discussion
+      )
+
+      post.reload
+      assert_in_delta 10.0, post.heat_score, 0.01
+      refute post.hot?
+
+      6.times { post.bump_heat!(:reply) } # replies give the biggest boost
+      post.reload
+
+      assert post.hot?
+      assert_not_nil post.hot_until
+      assert_in_delta (Time.current + Post::HOT_DURATION).to_i, post.hot_until.to_i, 1
+    end
+  end
+
+  test "heat decays and hot flag clears after window" do
+    author = users(:alice)
+    cliq   = cliqs(:child_cliq)
+
+    travel_to Time.zone.local(2024, 1, 1, 12) do
+      post = Post.create!(
+        title: "Heat decay #{SecureRandom.hex(3)}",
+        cliq: cliq,
+        user: author,
+        post_type: :discussion
+      )
+
+      6.times { post.bump_heat!(:reply) }
+      post.reload
+      assert post.hot?
+      initial_hot_until = post.hot_until
+
+      travel_to Time.current + 25.hours do
+        post.reload
+        refute post.hot?
+        assert initial_hot_until < Time.current
+
+        post.register_view! # apply decay and drop stale hot window
+        post.reload
+        assert_nil post.hot_until
+        assert post.heat_score < Post::HEAT_THRESHOLD
+      end
     end
   end
 end

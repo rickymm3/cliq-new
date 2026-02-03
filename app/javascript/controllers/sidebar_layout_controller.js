@@ -7,7 +7,8 @@ export default class extends Controller {
     "rightSide",
     "leftToggle",
     "rightToggle",
-    "mobileToggle"
+    "mobileToggle",
+    "overlay"
   ]
 
   connect() {
@@ -17,7 +18,6 @@ export default class extends Controller {
     this._onResize = this.updateBreakpoints.bind(this)
     window.addEventListener("resize", this._onResize)
 
-    // Seed manual state so responsive logic has consistent values
     if (!this.leftSideTarget.dataset.manualCollapsed) {
       this.leftSideTarget.dataset.manualCollapsed = "false"
     }
@@ -27,6 +27,7 @@ export default class extends Controller {
 
     this.updateBreakpoints()
     this.updateToggleIcons()
+    this.updateOverlayState()
   }
 
   disconnect() {
@@ -55,6 +56,7 @@ export default class extends Controller {
 
     this.updateToggleIcons()
     this.updateMobileToggleVisibility()
+    this.updateOverlayState()
   }
 
   toggleSide(side, name) {
@@ -72,21 +74,32 @@ export default class extends Controller {
 
     this.updateToggleIcons()
     this.updateMobileToggleVisibility()
+    this.updateOverlayState()
   }
 
   updateBreakpoints() {
     const width = window.innerWidth || document.documentElement.clientWidth
+    const leavingLeftOverlay = this.leftSideTarget.dataset.autoCollapsed === "true" &&
+      width >= this.LEFT_BREAKPOINT
 
     this.applyAutoState(this.rightSideTarget, "right", false)
     this.applyAutoState(this.leftSideTarget, "left", width < this.LEFT_BREAKPOINT)
 
+    if (leavingLeftOverlay) {
+      this.leftSideTarget.dataset.manualCollapsed = "false"
+      this.leftSideTarget.classList.remove("is-collapsed")
+      this.element.classList.remove("has-left-collapsed")
+    }
+
     this.updateToggleIcons()
     this.updateMobileToggleVisibility()
+    this.updateOverlayState()
   }
 
   applyAutoState(side, name, shouldOverlay) {
     if (!side) return
 
+    const wasOverlay = side.dataset.autoCollapsed === "true"
     side.dataset.autoCollapsed = shouldOverlay ? "true" : "false"
 
     if (shouldOverlay) {
@@ -101,6 +114,9 @@ export default class extends Controller {
       }
     } else {
       side.classList.remove("is-overlay")
+      if (wasOverlay) {
+        side.dataset.manualCollapsed = "false"
+      }
       const manualCollapsed = side.dataset.manualCollapsed === "true"
       if (manualCollapsed) {
         side.classList.add("is-collapsed")
@@ -148,5 +164,24 @@ export default class extends Controller {
     const width = window.innerWidth || document.documentElement.clientWidth
     const shouldShow = width < this.LEFT_BREAKPOINT
     this.mobileToggleTarget.classList.toggle("d-none", !shouldShow)
+  }
+
+  updateOverlayState() {
+    if (!this.hasOverlayTarget) return
+    const active = this.leftSideTarget.classList.contains("is-overlay") &&
+                   !this.leftSideTarget.classList.contains("is-collapsed")
+    this.overlayTarget.classList.toggle("is-active", active)
+  }
+
+  closeOverlays(event) {
+    if (!this.leftSideTarget.classList.contains("is-overlay")) return
+    if (this.leftSideTarget.classList.contains("is-collapsed")) return
+
+    this.leftSideTarget.classList.add("is-collapsed")
+    this.leftSideTarget.dataset.manualCollapsed = "true"
+    this.element.classList.add("has-left-collapsed")
+    this.updateToggleIcons()
+    this.updateMobileToggleVisibility()
+    this.updateOverlayState()
   }
 }
